@@ -10,9 +10,9 @@ function facetag_admin_tabsheet($selected = 'config')
   include_once(PHPWG_ROOT_PATH.'admin/include/tabsheet.class.php');
   $tabsheet = new tabsheet();
   $tabsheet->set_id('face_tag');
-  $tabsheet->add('config', 'Configuration générale', FACETAG_ADMIN . '&tab=config');
-  $tabsheet->add('config2', 'Paramètres avancés', FACETAG_ADMIN . '&tab=config2');
-  $tabsheet->add('help', 'Aide', FACETAG_ADMIN . '&tab=help');
+  $tabsheet->add('config', l10n('Configuration générale'), FACETAG_ADMIN . '&tab=config');
+  // $tabsheet->add('config2', 'Paramètres avancés', FACETAG_ADMIN . '&tab=config2');
+  $tabsheet->add('help', l10n('Aide'), FACETAG_ADMIN . '&tab=help');
   $tabsheet->select($selected);
   $tabsheet->assign();
 }

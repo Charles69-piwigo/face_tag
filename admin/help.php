@@ -1,9 +1,6 @@
 <?php
 defined('FACETAG_PATH') or die('Hacking attempt!');
 
-// Inclure les fonctions communes avec chemin relatif
-//include_once(dirname(__FILE__) . '/functions.inc.php');
-
 
 // Afficher le tabsheet
 facetag_admin_tabsheet('help');

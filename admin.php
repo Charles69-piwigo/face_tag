@@ -2,8 +2,7 @@
 defined('PHPWG_ROOT_PATH') or die('Hacking attempt!');
 
 // Inclure les fonctions communes avec chemin relatif
-// fonction d'affichage des onglets
-include_once(dirname(__FILE__) . '/admin/functions.inc.php');
+include_once(dirname(__FILE__) . '/admin/functions.inc.php'); // fonction d'affichage des onglets
 
 // Récupérer la page demandée
 $page_name = isset($_GET['tab']) ? $_GET['tab'] : 'config'; /// définit l'onglet pré selectionné

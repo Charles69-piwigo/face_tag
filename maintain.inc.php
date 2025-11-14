@@ -14,7 +14,7 @@ function plugin_install()
 // Désinstallation du plugin
 function plugin_uninstall()
 {
-    //conf_delete_param('face_tag');
+    conf_delete_param('face_tag_config');
 }
 
 // Désactivation du plugin

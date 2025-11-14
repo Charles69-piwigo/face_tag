@@ -35,7 +35,8 @@
 }
 
 .help-section p {
-  line-height: 1.6;
+  text-align : left ;
+  line-height: 1.4;
   color: #666;
 }
 
@@ -73,98 +74,73 @@
 </style>
 
 <div class="help-container">
-  <!-- Colonne gauche -->
+
+ <!-- Colonne droite -->
   <div class="help-column">
-    <h3>🚀 Démarrage rapide</h3>
+    <h3>{'Paramètres'|@translate}</h3>
     
     <div class="help-section">
-      <h4>Installation</h4>
-      <p>Le plugin Face Tag permet d'afficher les visages tagués avec Digikam dans votre galerie Piwigo.</p>
+      <h4>{'Modes de fonctionnement'|@translate}</h4>  
+      <h4>{'Affichage temporaire ou Affichage permanent'|@translate}</h4>
+      <p>{'On peut utiliser le plugin de deux façons :'|@translate} </p>
       <ul>
-        <li>Installez le plugin depuis le gestionnaire de plugins</li>
-        <li>Activez-le</li>
-        <li>Configurez les paramètres selon vos besoins</li>
+        <li><strong>{'Affichage temporaire :'|@translate}</strong></li>
+        <p>{'Dans ce mode cliquez sur le bouton pour afficher les visages, un deuxième clic enlève l\'affichage'|@translate} </p>
+        <p>{'Quand on change de photo, il faut recliquer sur le bouton pour afficher les visages'|@translate} </p>
+        <li><strong>{'Affichage persistant :'|@translate}</strong></li>
+        <p>{'Dans ce mode le bouton fonctionne comme un interrupteur, si des visages sont tagués sur la photo ils s\'affichent, quelle que soit la photo'|@translate} </p>
+        <p>{'Un deuxième clic stoppe l\'affichage des visages'|@translate} </p>
       </ul>
     </div>
 
     <div class="help-section">
-      <h4>Configuration générale</h4>
-      <p>Dans l'onglet "Configuration générale", vous pouvez définir :</p>
-      <ul>
-        <li><strong>Paramètre 1 :</strong> Description du paramètre 1</li>
-        <li><strong>Paramètre 2 :</strong> Description du paramètre 2</li>
-      </ul>
-    </div>
-
-    <div class="help-note">
-      <strong>💡 Note :</strong> Pensez à sauvegarder vos modifications après chaque changement de configuration.
+      <h4>{'bouton voir les XMP'|@translate}</h4>
+      <p>{'Quand il est affiché ce bouton est le plus à gauche sur la barre de navigation, il affiche un popup avec toutes les métadonnées XMP de la photo. Utile pour le débugage'|@translate} </p>
     </div>
 
     <div class="help-section">
-      <h4>Intégration avec Digikam</h4>
-      <p>Pour que le plugin fonctionne correctement avec Digikam :</p>
-      <ol>
-        <li>Assurez-vous que vos photos sont taguées dans Digikam</li>
-        <li>Exportez vos photos vers Piwigo</li>
-        <li>Le plugin détectera automatiquement les tags de visages</li>
-      </ol>
-    </div>
-  </div>
-
-  <!-- Colonne droite -->
-  <div class="help-column">
-    <h3>⚙️ Paramètres avancés</h3>
-    
-    <div class="help-section">
-      <h4>Valeur numérique</h4>
-      <p>Définit le nombre d'éléments à afficher par page. Valeur recommandée : entre 10 et 50.</p>
-    </div>
-
-    <div class="help-section">
-      <h4>Options de configuration</h4>
-      <ul>
-        <li><strong>Option 1 :</strong> Mode d'affichage standard</li>
-        <li><strong>Option 2 :</strong> Mode d'affichage avancé avec filtres</li>
-      </ul>
-    </div>
-
-    <div class="help-section">
-      <h4>Cases à cocher</h4>
-      <ul>
-        <li><strong>Cas 1 :</strong> Activer la fonctionnalité X</li>
-        <li><strong>Cas 2 :</strong> Activer la fonctionnalité Y</li>
-        <li><strong>Cas 3 :</strong> Activer la fonctionnalité Z</li>
-      </ul>
-    </div>
-
-    <div class="help-section">
-      <h4>Liste déroulante</h4>
-      <p>Sélectionnez le mode de tri des visages :</p>
-      <ul>
-        <li><strong>A1 :</strong> Tri par nom</li>
-        <li><strong>A2 :</strong> Tri par date</li>
-        <li><strong>A3 :</strong> Tri par popularité</li>
-        <li><strong>A4 :</strong> Tri personnalisé</li>
-      </ul>
+      <h4>{'Apparences du rectangle et du libellé'|@translate}</h4>
+      <p>{'Définir les caractéristiques du cadre et du libellé.'|@translate}</p>
+      
     </div>
 
     <div class="help-tip">
-      <strong>💡 Astuce :</strong> Le slider permet d'ajuster la sensibilité de détection. Une valeur plus élevée détecte plus de visages mais peut générer des faux positifs.
+      <strong> Important  :</strong> {'N\'oubliez pas d\'enregistrer les modifications !!!'|@translate}
     </div>
 
-    <div class="help-section">
-      <h4>Slider horizontal</h4>
-      <p>Ajuste le seuil de confiance pour la reconnaissance faciale (0-100). Valeur recommandée : 70-80.</p>
-    </div>
+        
+  </div>
 
+  <!-- Colonne gauche -->
+  <div class="help-column">
+    <h3>{'Généralités'|@translate}</h3>
+    
     <div class="help-section">
-      <h4>Besoin d'aide ?</h4>
-      <p>Pour toute question ou problème :</p>
+      <h4>{'Face Tag - Reconnaissance faciale'|@translate}</h4>
+      <p>{'Le plugin Face Tag permet d\'afficher les visages tagués dans votre galerie Piwigo.'|@translate}</p>
+      <p>{'Il existe deux méthodes pour enregistrer les visages dans les métadonnées XMP des jpg :'|@translate} </p>
       <ul>
-        <li>Consultez la documentation sur le forum Piwigo</li>
-        <li>Contactez le support</li>
-        <li>Visitez le site du plugin</li>
+        <li>{'MPReg (Microsoft Photo Region)'|@translate}</li>
+        <li>{'MWG-RS (Metadata Working Group - Region Schema).'|@translate}</li>
+      </ul>
+      <p>{'Ces méthodes sont utilisées par digiKam, Light Room, Apple Photos, ACDSee Photo Studio et feu-Picasa'|@translate}  </p>
+      <p>{'Ces programmes permettent d\'enregistrer les informations dans les métadonnées des photos'|@translate}  </p>
+      <p>{'Face Tag détecte automatiquement la méthode utilisée. '|@translate}</p>
+    </div>
+
+ <div class="help-section">
+      <h4>{'digiKam'|@translate}</h4>
+      <p>{'digiKam est un programme open source de catalogage et d\'édition de photos.'|@translate}</p>
+      <p>{'Il permet de détecter de manière semi automatique les visages, et d\'enregistrer les données dans le jpg'|@translate}</p>
+      <p>{'Ces données sont lisibles dans piwigo avec le plugin Face Tag , quelle que soit la manière dont vous importez les photos dans piwigo :'|@translate}</p>
+      <ul>
+        <li>{'Upload des photos'|@translate}</li>
+        <li>{'Synchronisation'|@translate}</li>
       </ul>
     </div>
+
+
   </div>
+
+ 
 </div>
