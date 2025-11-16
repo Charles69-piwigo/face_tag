@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.3
+Version: 1.4
 Description: afficher les visages tagués avec digiKam
 Plugin URI: https://fr.piwigo.org/ext/index.php?eid=1051
 Author: Charles69
@@ -12,7 +12,11 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
-  version 1.3 - 16/11/2025
+ version 1.4 - 16/11/2025
+    corrigé jQuery non chargé dans certaines configurations
+    testé avec les thèmes Bootstrap_Darkroom, Modus et Elegant
+    
+ version 1.3 - 16/11/2025
     paramètres ajout bouton valeurs par défaut
     correction taduction uk
     changement couleur sur bouton toggle
@@ -56,7 +60,20 @@ define('FACETAG_DIR', PHPWG_ROOT_PATH . PWG_LOCAL_DIR . 'face_tag/'); // ./local
 
 // SCRIPT =======================================================================================
 
-add_event_handler('loc_begin_page_tail', 'facetag_add_extension');
+add_event_handler('loc_begin_page_header', 'facetag_load_jquery');
+function facetag_load_jquery()
+{
+    global $template;
+    
+    // Charger jQuery dans le head pour garantir sa disponibilité
+    $template->append('head_elements', '
+    <script type="text/javascript" src="' . get_root_url() . 'themes/default/js/jquery.min.js"></script>
+    ');
+}
+
+
+
+add_event_handler('loc_end_page_tail', 'facetag_add_extension');
 function facetag_add_extension()
 {
     global $page, $template;
@@ -64,7 +81,11 @@ function facetag_add_extension()
     $template->append('footer_elements', '
     <script src="plugins/face_tag/facetag.js"></script>
     <link rel="stylesheet" href="plugins/face_tag/template/facetag.css">
+    </script>
+
     ');
+
+       
     
 }
 

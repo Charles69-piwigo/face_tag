@@ -1,4 +1,6 @@
+
 // Face Tag - JavaScript
+
 (function($) {
   'use strict';
   

@@ -8,7 +8,6 @@ function plugin_install()
     
 }
 
-
 // Désinstallation du plugin
 function plugin_uninstall()
 {

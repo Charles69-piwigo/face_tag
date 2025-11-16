@@ -63,7 +63,6 @@ if (isset($_POST['submit']))   // quand on clique sur Enregistrer la configurati
 
 if (isset($_POST['reinit']))   // quand on clique sur Valeurs par défaut
 {
-
 $config =$config_defaut ;  
 save_config($config)  ;
 }
@@ -82,12 +81,11 @@ $template->assign(array(
   'LABEL_FONT_SIZE' => $config['label_font_size'],
   'LABEL_BG_COLOR' => $config['label_bg_color'],
   'LABEL_BG_OPACITY' => $config['label_bg_opacity'],
-
 ));
-
 
 // Charger le template
 $template->set_filename('face_tag_config', dirname(__FILE__).'/../template/config.tpl');
 $template->assign_var_from_handle('ADMIN_CONTENT', 'face_tag_config');
 
+//---------------------------------------------------------------------
 ?>
