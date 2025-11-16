@@ -61,34 +61,18 @@
 }
 
 
-/* Boutons Face Tag 
-#facetag_show_xmp,
-#facetag_show_faces {
-  display: inline-block;
-  background-color: #43cc43;
-  color: #ffffff;
-  padding: 5px 5px;
-  border-radius: 1px;
-  text-decoration: none;
-  border: 1px solid #555555;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* État ACTIF du bouton */
+#facetag_show_faces.facetag-active {
+  background-color: transparent !important; 
+  color: white !important;
+  /*border-color: #45a049 !important; */
+  /*box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;*/
 }
 
-#facetag_show_xmp:hover,
-#facetag_show_faces:hover {
-  background-color: #555555;
-  border-color: #777777;
+/* Icône en état actif (vert plus clair) */
+#facetag_show_faces.facetag-active img {
+  background-color: #66bb6a !important;
 }
-
-#facetag_show_xmp img,
-#facetag_show_faces img {
-  width: 22px;
-  height: 22px;
-  vertical-align: middle;
-  margin-right: 5px;
-}
-*/
 
 /* Overlays des visages */
 .facetag-overlay {
@@ -124,5 +108,5 @@
   color: white !important;
   border-color: #45a049 !important;
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;
-  border: 1px red;
+  
 }

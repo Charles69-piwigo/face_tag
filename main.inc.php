@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.0
+Version: 1.3
 Description: afficher les visages tagués avec digiKam
-Plugin URI:
+Plugin URI: https://fr.piwigo.org/ext/index.php?eid=1051
 Author: Charles69
 Author URI:
 Has Settings: webmaster
@@ -12,8 +12,20 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
- 
- version 1.0 - 14/11/2025
+  version 1.3 - 16/11/2025
+    paramètres ajout bouton valeurs par défaut
+    correction taduction uk
+    changement couleur sur bouton toggle
+    console.log en remarques
+    
+  version 1.2 - 15/11/2025
+    erreur dans maintain.inc.php
+
+  version 1.1 - 15/11/2025
+    modifé les paramétres par défaut - fichier de paramétres config_defaut.php
+    ajouté Plugin URI
+
+  version 1.0 - 14/11/2025
   
 */
 //=================================================================================
@@ -68,36 +80,25 @@ add_event_handler('init', 'facetag_init');
 
 // Ajouter le bouton dans la barre de navigation de la page photo
 add_event_handler('loc_end_picture', 'facetag_picture_toolbar');
-
 function facetag_picture_toolbar()
 {
   global $template, $user, $picture;
+
+  // Charger les valeurs par défaut
+  include(dirname(__FILE__) . '/install/config_defaut.php'); 
   
-  // Charger la configuration avec gestion d'erreur
+  // Charger la configuration
   $config_raw = conf_get_param('face_tag_config', false);
+  $config = ($config_raw !== false) ? @unserialize($config_raw) : false;
   
-  if ($config_raw === false || $config_raw === null) {
-    // Pas de config : valeurs par défaut
-    $config = array(
-      'show_xmp_button' => true,
-      'show_faces_button' => true,
-    );
+  if (!is_array($config)) {
+    $config = $config_defaut;
   } else {
-    $config = @unserialize($config_raw);
-    
-    // Si unserialize échoue
-    if (!is_array($config)) {
-      $config = array(
-        'show_xmp_button' => true,
-        'show_faces_button' => true,
-      );
-    }
+    $config = array_merge($config_defaut, $config);  // gestion de la modif des config
   }
   
-  // S'assurer que les clés existent
-  if (!isset($config['show_xmp_button'])) $config['show_xmp_button'] = true;
-  if (!isset($config['show_faces_button'])) $config['show_faces_button'] = true;
-
+  //echo "boutons = ",$config['show_xmp_button'] , $config['show_faces_button'] ;
+  
   // Ne rien afficher si les deux boutons sont désactivés
   if (!$config['show_xmp_button'] && !$config['show_faces_button']) {
     return;
@@ -109,27 +110,26 @@ function facetag_picture_toolbar()
   $ajax_url = get_root_url() . 'ws.php?format=json&method=facetag.getXMP&image_id=' . $picture['current']['id'];
   $icon = get_root_url() . 'plugins/' . FACETAG_ID . '/images/face.png';
   
-  // Assigner les variables au template - FORCER les valeurs
+  // Assigner les variables au template 
+  
   $template->assign(array(
     'FACETAG_AJAX_URL' => $ajax_url,
     'FACETAG_ICON' => $icon,
     'FACETAG_PATH' => FACETAG_PATH,
     'FACETAG_SHOW_XMP' => (bool)$config['show_xmp_button'],
     'FACETAG_SHOW_FACES' => (bool)$config['show_faces_button'],
-    'FACETAG_DISPLAY_MODE' => isset($config['faces_display_mode']) ? $config['faces_display_mode'] : 'toggle', // NOUVEAU
-
-// NOUVEAU : Paramètres visuels
-  'FACETAG_RECT_COLOR' => isset($config['rect_color']) ? $config['rect_color'] : '#00ff00',
-  'FACETAG_RECT_WIDTH' => isset($config['rect_width']) ? $config['rect_width'] : 3,
-  'FACETAG_RECT_OPACITY' => isset($config['rect_opacity']) ? $config['rect_opacity'] : 0.8,
-  'FACETAG_LABEL_TEXT_COLOR' => isset($config['label_text_color']) ? $config['label_text_color'] : '#ffffff',
-  'FACETAG_LABEL_FONT_SIZE' => isset($config['label_font_size']) ? $config['label_font_size'] : 12,
-  'FACETAG_LABEL_BG_COLOR' => isset($config['label_bg_color']) ? $config['label_bg_color'] : '#000000',
-  'FACETAG_LABEL_BG_OPACITY' => isset($config['label_bg_opacity']) ? $config['label_bg_opacity'] : 0.8,
-
+    'FACETAG_DISPLAY_MODE' => isset($config['faces_display_mode']) ? $config['faces_display_mode'] : $config_defaut['faces_display_mode'],
+    'FACETAG_RECT_COLOR' => isset($config['rect_color']) ? $config['rect_color'] : $config_defaut['rect_color'],
+    'FACETAG_RECT_WIDTH' => isset($config['rect_width']) ? $config['rect_width'] : $config_defaut['rect_width'] ,
+    'FACETAG_RECT_OPACITY' => isset($config['rect_opacity']) ? $config['rect_opacity'] : $config_defaut['rect_opacity'],
+    'FACETAG_LABEL_TEXT_COLOR' => isset($config['label_text_color']) ? $config['label_text_color'] : $config_defaut['label_text_color'],
+    'FACETAG_LABEL_FONT_SIZE' => isset($config['label_font_size']) ? $config['label_font_size'] : $config_defaut['label_font_size'],
+    'FACETAG_LABEL_BG_COLOR' => isset($config['label_bg_color']) ? $config['label_bg_color'] : $config_defaut['label_bg_color'],
+    'FACETAG_LABEL_BG_OPACITY' => isset($config['label_bg_opacity']) ? $config['label_bg_opacity'] : $config_defaut['label_bg_opacity'],
 
   ));
   
+
   // Choix du template selon le thème
   if ($user['theme'] == 'bootstrapdefault' || $user['theme'] == 'bootstrap_darkroom') {
     $tpl_file = 'picture_facetag_Bootstrap.tpl';
@@ -259,7 +259,6 @@ function facetag_init()
 {
   // language
 load_language('plugin.lang', FACETAG_PATH);
-
 }
-
+//==================================
 ?>

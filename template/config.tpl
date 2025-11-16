@@ -5,6 +5,7 @@
 <form method="post" action="" class="properties">
    <p style="text-align: left; margin-left: 40px;">
     <input type="submit" name="submit" value="{'Enregistrer'|@translate}">
+    <input type="submit" name="reinit" value="{'Init'|@translate}">
   </p>
   <fieldset>
     
@@ -14,8 +15,8 @@
       <legend>{'Bouton d\'interface'|@translate}</legend>
       <li>
         <label>
-          <input type="checkbox" name="show_faces_button" {if $SHOW_FACES_BUTTON}checked="checked{/if}>
-          {'Afficher le bouton "Afficher les visages"'|@translate}
+          <input type="checkbox" name="show_faces_button" {if $SHOW_FACES_BUTTON}checked='checked'{/if}>
+         {'Afficher le bouton "Afficher les visages"'|@translate}
         </label>
       </li>
 
@@ -78,7 +79,7 @@
     <li>
       <label>
         {'Taille de la police (px) :'|@translate}
-        <input type="number" name="label_font_size" value={$LABEL_FONT_SIZE} min="8" max="24" style="width: 80px;">
+        <input type="number" name="label_font_size" value={$LABEL_FONT_SIZE} min="8" max="36" style="width: 80px;">
       </label>
     </li>
     
@@ -97,15 +98,16 @@
       </label>
       <p class="formHint">{'0 = transparent, 1 = opaque'|@translate}</p>
     </li>
-  </ul>
-<legend>{'Bouton XMP'|@translate}</legend>
-    <ul>  
-    <li>
+  
+  <legend>{'Bouton XMP'|@translate}</legend>
+      <li>
         <label>
-          <input type="checkbox" name="show_xmp_button" {if $SHOW_XMP_BUTTON}checked="checked{/if}>
-          {'Afficher le bouton "Voir les XMP" - pour débugage'|@translate}
+          <input type="checkbox" name="show_xmp_button" {if $SHOW_XMP_BUTTON}checked='checked'{/if}>
+         {'Afficher le bouton XMP'|@translate}
         </label>
       </li>
+
+
 </ul>
 </fieldset>
   

@@ -1,9 +1,15 @@
 <?php
+// boutons
+$lang['Afficher les visages tagués'] = 'Show tagged faces';
+$lang['Voir les métadonnées XMP'] = 'View XMP metadata';
+// entete paramètres
 $lang['Configuration générale'] = 'General Settings';
 $lang['Aide'] = 'Help';
+$lang['Configuration enregistrée avec succès'] = 'Configuration saved successfully';
 
 $lang['Face Tag - Configuration générale'] = 'Face Tag - General Settings';
 $lang['Enregistrer'] = 'Save settings';
+$lang['Init'] = 'Default values';
 $lang['Bouton d\'interface'] = 'Interface button';
 $lang['Afficher le bouton "Afficher les visages"'] = 'Show "Show faces" button';
 $lang['Mode d\'affichage des visages :'] = 'Face display mode:';
@@ -21,7 +27,7 @@ $lang['Taille de la police (px) :'] = 'Font size (px) :';
 $lang['Couleur de fond :'] = 'Background color :';
 $lang['Opacité du fond :'] = 'Background opacity :';
 $lang['Bouton XMP'] = 'XMP button';
-$lang['Afficher le bouton "Voir les XMP" - pour débugage'] = 'Show "View XMPs" button - for debugging';
+$lang['Afficher le bouton XMP'] = 'Show "View XMP" button - for debugging';
 
 $lang['Paramètres'] = 'Settings';
 $lang['Modes de fonctionnement'] = 'Operating modes';

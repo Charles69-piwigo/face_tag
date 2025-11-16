@@ -1,9 +1,15 @@
 <?php
+// boutons
+$lang['Afficher les visages tagués'] = 'Afficher les visages tagués';
+$lang['Voir les métadonnées XMP'] = 'Voir les métadonnées XMP';
+// entete paramètres
 $lang['Configuration générale'] = 'Configuration générale';
 $lang['Aide'] = 'Aide';
+$lang['Configuration enregistrée avec succès'] = 'Configuration enregistrée avec succès';
 
 $lang['Face Tag - Configuration générale'] = 'Face Tag - Configuration générale';
 $lang['Enregistrer'] = 'Enregistrer la configuration';
+$lang['Init'] = 'Valeurs par défaut';
 $lang['Bouton d\'interface'] = 'Bouton d\'interface';
 $lang['Afficher le bouton "Afficher les visages"'] = 'Afficher le bouton "Afficher les visages"';
 $lang['Mode d\'affichage des visages :'] = 'Mode d\'affichage des visages :';
@@ -20,7 +26,7 @@ $lang['Couleur du texte :'] = 'Couleur du texte :';
 $lang['Taille de la police (px) :'] = 'Taille de la police (px) :';
 $lang['Couleur de fond :'] = 'Couleur de fond :';
 $lang['Opacité du fond :'] = 'Opacité du fond :';
-$lang['Afficher le bouton "Voir les XMP" - pour débugage'] = 'Afficher le bouton "Voir les XMP" - pour débugage';
+$lang['Afficher le bouton XMP'] = 'Afficher le bouton "Voir les XMP" - pour débugage';
 
 $lang['Modes de fonctionnement'] = 'Modes de fonctionnement';
 $lang['Affichage temporaire ou Affichage permanent'] = 'Affichage temporaire ou Affichage permanent';

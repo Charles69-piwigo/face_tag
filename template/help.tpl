@@ -125,7 +125,7 @@
       </ul>
       <p>{'Ces méthodes sont utilisées par digiKam, Light Room, Apple Photos, ACDSee Photo Studio et feu-Picasa'|@translate}  </p>
       <p>{'Ces programmes permettent d\'enregistrer les informations dans les métadonnées des photos'|@translate}  </p>
-      <p>{'Face Tag détecte automatiquement la méthode utilisée. '|@translate}</p>
+      <p>{'Face Tag détecte automatiquement la méthode utilisée.'|@translate}</p>
     </div>
 
  <div class="help-section">
