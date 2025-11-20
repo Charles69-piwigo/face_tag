@@ -370,10 +370,21 @@ $(document).on('click', '#facetag_show_faces', function(e) {
       //console.log('DEBUG - $img:', $img);
       //console.log('DEBUG - Tag:', $img[0].tagName);
       
-      var $container = $img.parent();
-      if (!$container.hasClass('facetag-container')) {
-        $container.css('position', 'relative').addClass('facetag-container');
-      }
+var $container = $img.parent();
+
+// Si le parent n'est pas encore le conteneur facetag
+if (!$container.hasClass('facetag-container')) {
+  // Wrapper l'image dans un nouveau div
+  $img.wrap('<div class="facetag-container"></div>');
+  $container = $img.parent();
+}
+
+// S'assurer que le conteneur parent est centré
+var $parentContainer = $container.parent();
+if (!$parentContainer.hasClass('facetag-wrapper')) {
+  $container.wrap('<div class="facetag-wrapper"></div>');
+  $parentContainer = $container.parent();
+}
       
       $('.facetag-overlay').remove();
       
@@ -437,13 +448,21 @@ $(document).on('click', '#facetag_show_faces', function(e) {
 
     var labelBgRgba = hexToRgba(config.label_bg_color, config.label_bg_opacity);
 
-    var $label = $('<div class="facetag-label">')
-      .text(face.name)
-      .css({
-        color: config.label_text_color,
-        fontSize: config.label_font_size + 'px',
-        background: labelBgRgba
-      });
+    // Calculer le padding proportionnel à la taille de la police
+var paddingVertical = Math.max(3, Math.round(config.label_font_size * 0.3));
+var paddingHorizontal = Math.max(8, Math.round(config.label_font_size * 0.7));
+
+var $label = $('<div class="facetag-label">')
+  .text(face.name)
+  .css({
+    color: config.label_text_color,
+    fontSize: config.label_font_size + 'px',
+    background: labelBgRgba,
+    padding: paddingVertical + 'px ' + paddingHorizontal + 'px',  // Dynamique
+    fontWeight: 'normal',
+    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+    lineHeight: 'normal'  // Important pour la hauteur
+  });
         
         $overlay.append($label);
         $container.append($overlay);
