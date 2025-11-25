@@ -58,8 +58,9 @@ console.log('Bouton Faces:', $('#facetag_show_faces').length);
         dataType: 'json',
         success: function(data) {
           if (data.stat === 'ok' && data.result.xmp) {
-            xmpData = data.result.xmp;
-            displayXmpData(xmpData);
+            xmpData = data.result.xmp;                   /// 61
+            xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
+displayXmpData(xmpData);
           } else if (data.result && data.result.error) {
             showXmpModal('<div style="color:red; padding:10px;">Erreur: ' + data.result.error + '</div>');
           } else {
@@ -193,8 +194,9 @@ $(document).on('click', '#facetag_show_faces', function(e) {
     dataType: 'json',
     success: function(data) {
       if (data.stat === 'ok' && data.result.xmp) {
-        xmpData = data.result.xmp;
-        facesData = parseFacesFromXMP(xmpData);
+        xmpData = data.result.xmp;                        //196
+       xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
+facesData = parseFacesFromXMP(xmpData);
         
         //console.log('XMP data:', xmpData);
         //console.log('Visages trouvés:', facesData);
@@ -350,7 +352,43 @@ $(document).on('click', '#facetag_show_faces', function(e) {
       //console.log('Détails:', faces);
       return faces;
     }
-    
+/// 350
+// Transformer les coordonnées selon l'orientation EXIF
+function transformCoordinates(left, top, width, height, orientation) {
+  var newLeft, newTop, newWidth, newHeight;
+  console.log('Orientation = ',orientation);
+  switch(orientation) {
+    case 1: // Normal
+      return {left: left, top: top, width: width, height: height};
+      
+    case 3: // Rotate 180
+      newLeft = 100 - left - width;
+      newTop = 100 - top - height;
+      return {left: newLeft, top: newTop, width: width, height: height};
+      
+    case 6: // Rotate 90 CW
+    // Pour afficher correctement après rotation
+    newLeft = 100 - top - height;
+    newTop = left;
+    newWidth = height;
+    newHeight = width;
+    return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
+      
+    case 8: // Rotate 90 CCW (270 CW)
+      // Transformation : x' = 100 - y - height, y' = x
+      newLeft = 100 - top - height;
+      newTop = left;
+      newWidth = height;
+      newHeight = width;
+      return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
+      
+    default:
+      return {left: left, top: top, width: width, height: height};
+  }
+}
+
+
+
     // Afficher les visages sur l'image
     function displayFaces(faces) {
       // Chercher d'abord la balise IMG
@@ -423,6 +461,15 @@ if (!$parentContainer.hasClass('facetag-wrapper')) {
           
           //console.log('mwg-rs - Centre converti en coin supérieur gauche');
         }
+
+        /// 391-416
+        // NOUVEAU : Appliquer la transformation selon l'orientation EXIF
+var orientation = xmpData.orientation || 1;
+var transformed = transformCoordinates(left, top, width, height, orientation);
+left = transformed.left;
+top = transformed.top;
+width = transformed.width;
+height = transformed.height;
         
         console.log('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
         
@@ -521,8 +568,9 @@ if (displayMode === 'persistent') {
       dataType: 'json',
       success: function(data) {
         if (data.stat === 'ok' && data.result.xmp) {
-          xmpData = data.result.xmp;
-          facesData = parseFacesFromXMP(xmpData);
+          xmpData = data.result.xmp;                       ///505
+          xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
+facesData = parseFacesFromXMP(xmpData);
           
           //console.log('Visages trouvés (auto):', facesData.length);
           

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.5
+Version: 1.6
 Description: afficher les visages tagués avec digiKam
 Plugin URI: https://fr.piwigo.org/ext/index.php?eid=1051
 Author: Charles69
@@ -12,6 +12,11 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+     
+ version 1.6 - 25/11/2025
+    ajouté support orientation EXIF pour photos en mode portrait
+    corrigé orientation type6 = 90 CW
+ 
  version 1.5 - 20/11/2025
     corrigé conflit avec l'absence de super_zoom
  
@@ -216,9 +221,19 @@ WHERE id = ' . intval($params['image_id']);
   // Extraire les XMP avec Imagick
   $xmp_data = facetag_extract_xmp($image_path);
   
+  // Récupérer l'orientation EXIF
+  $orientation = 1; // Valeur par défaut (normal)
+  if (function_exists('exif_read_data')) {
+    $exif = @exif_read_data($image_path);
+    if ($exif && isset($exif['Orientation'])) {
+      $orientation = $exif['Orientation'];
+    }
+  }
+  
   return array(
     'xmp' => $xmp_data,
-    'image_id' => $params['image_id']
+    'image_id' => $params['image_id'],
+    'orientation' => $orientation
   );
 }
 
@@ -246,7 +261,7 @@ function facetag_extract_xmp($image_path)
     {
       // On récupère toutes les propriétés qui commencent par xmp, exif, etc.
       if (strpos($key, 'xmp:') === 0 || 
-        //  strpos($key, 'exif:') === 0 || 
+          strpos($key, 'exif:') === 0 || 
           strpos($key, 'dc:') === 0 ||
           strpos($key, 'Iptc4xmpCore:') === 0 ||
           strpos($key, 'mwg-rs:') === 0 ||
