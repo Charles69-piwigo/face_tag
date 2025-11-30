@@ -23,24 +23,24 @@
 
 
 /*
-console.log('=== DEBUG MODE ===');
-console.log('window.facetag_display_mode:', window.facetag_display_mode);
-console.log('displayMode final:', displayMode);
-console.log('localStorage facetag_persistent_mode:', localStorage.getItem('facetag_persistent_mode'));
-console.log('==================');
-console.log('Face Tag JS chargé');
-console.log('Mode d affichage:', displayMode); 
-console.log('Bouton XMP:', $('#facetag_show_xmp').length);
-console.log('Bouton Faces:', $('#facetag_show_faces').length);
+//console.log(('=== DEBUG MODE ===');
+//console.log(('window.facetag_display_mode:', window.facetag_display_mode);
+//console.log(('displayMode final:', displayMode);
+//console.log(('localStorage facetag_persistent_mode:', localStorage.getItem('facetag_persistent_mode'));
+//console.log(('==================');
+//console.log(('Face Tag JS chargé');
+//console.log(('Mode d affichage:', displayMode); 
+//console.log(('Bouton XMP:', $('#facetag_show_xmp').length);
+//console.log(('Bouton Faces:', $('#facetag_show_faces').length);
 */    
     
     // ==================== BOUTON 1 : AFFICHER LES XMP ====================
     $(document).on('click', '#facetag_show_xmp', function(e) {
       e.preventDefault();
-      //console.log('Clic sur bouton XMP');
+      //console.log(('Clic sur bouton XMP');
       
       var ajaxUrl = $(this).data('ajax-url');
-      //console.log('AJAX URL:', ajaxUrl);
+      //console.log(('AJAX URL:', ajaxUrl);
       
       // Si on a déjà les données, on les affiche
       if (xmpData) {
@@ -141,7 +141,7 @@ displayXmpData(xmpData);
     // ==================== BOUTON 2 : AFFICHER LES VISAGES ====================
 $(document).on('click', '#facetag_show_faces', function(e) {
   e.preventDefault();
-  //console.log('Clic sur bouton Visages');
+  //console.log(('Clic sur bouton Visages');
   
   var ajaxUrl = $(this).data('ajax-url');
   
@@ -174,7 +174,7 @@ $(document).on('click', '#facetag_show_faces', function(e) {
   // Si on a déjà les données XMP, on parse directement
   if (xmpData) {
     facesData = parseFacesFromXMP(xmpData);
-    //console.log('Visages trouvés:', facesData);
+    //console.log(('Visages trouvés:', facesData);
     
     if (facesData.length > 0) {
       displayFaces(facesData);
@@ -198,8 +198,8 @@ $(document).on('click', '#facetag_show_faces', function(e) {
        xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
 facesData = parseFacesFromXMP(xmpData);
         
-        //console.log('XMP data:', xmpData);
-        //console.log('Visages trouvés:', facesData);
+        //console.log(('XMP data:', xmpData);
+        //console.log(('Visages trouvés:', facesData);
         
         if (facesData.length > 0) {
           displayFaces(facesData);
@@ -223,11 +223,11 @@ facesData = parseFacesFromXMP(xmpData);
     function parseFacesFromXMP(data) {
       var faces = [];
       
-      //console.log('Parsing XMP data...');
+      //console.log(('Parsing XMP data...');
       
       // Si on a le XMP brut, on le parse
       if (data._raw_xmp) {
-        //console.log('Parsing _raw_xmp...');
+        //console.log(('Parsing _raw_xmp...');
         
         var xmlString = data._raw_xmp;
         
@@ -237,11 +237,11 @@ facesData = parseFacesFromXMP(xmpData);
         
         // === FORMAT 1 : MPReg (Microsoft Photo Region) ===
         var mpriRegions = xmlDoc.getElementsByTagName('MPRI:Regions');
-        //console.log('MPRI:Regions trouvés:', mpriRegions.length);
+        //console.log(('MPRI:Regions trouvés:', mpriRegions.length);
         
         if (mpriRegions.length > 0) {
           var rdfLis = mpriRegions[0].getElementsByTagName('rdf:li');
-          //console.log('Nombre de rdf:li dans MPRI:', rdfLis.length);
+          //console.log(('Nombre de rdf:li dans MPRI:', rdfLis.length);
           
           for (var i = 0; i < rdfLis.length; i++) {
             var li = rdfLis[i];
@@ -252,7 +252,7 @@ facesData = parseFacesFromXMP(xmpData);
             name = li.getAttribute('MPReg:PersonDisplayName');
             rect = li.getAttribute('MPReg:Rectangle');
             
-            //console.log('rdf:li', i, '(attributs) - Name:', name, 'Rectangle:', rect);
+            //console.log(('rdf:li', i, '(attributs) - Name:', name, 'Rectangle:', rect);
             
             // CAS 2 : Balises enfants (format multiligne)
             if (!name || !rect) {
@@ -266,7 +266,7 @@ facesData = parseFacesFromXMP(xmpData);
                 rect = rectNodes[0].textContent.trim();
               }
               
-              //console.log('rdf:li', i, '(balises) - Name:', name, 'Rectangle:', rect);
+              //console.log(('rdf:li', i, '(balises) - Name:', name, 'Rectangle:', rect);
             }
             
             if (name && rect) {
@@ -283,7 +283,7 @@ facesData = parseFacesFromXMP(xmpData);
                   h: coords[3],
                   format: 'mpreg'
                 });
-                //console.log('✓ Visage ajouté (MPReg):', name, coords);
+                //console.log(('✓ Visage ajouté (MPReg):', name, coords);
               }
             }
           }
@@ -291,19 +291,25 @@ facesData = parseFacesFromXMP(xmpData);
         
         // === FORMAT 2 : mwg-rs (Metadata Working Group - Regions) ===
         var mwgRegionList = xmlDoc.getElementsByTagName('mwg-rs:RegionList');
-        //console.log('mwg-rs:RegionList trouvés:', mwgRegionList.length);
+        //console.log(('mwg-rs:RegionList trouvés:', mwgRegionList.length);
         
         if (mwgRegionList.length > 0) {
-          var descriptions = mwgRegionList[0].getElementsByTagName('rdf:Description');
-          //console.log('Nombre de rdf:Description dans mwg-rs:', descriptions.length);
+          var descriptions = mwgRegionList[0].getElementsByTagName('rdf:li');
+          //console.log(('Nombre de rdf:li dans mwg-rs:', descriptions.length);
           
           for (var i = 0; i < descriptions.length; i++) {
             var desc = descriptions[i];
             
-            var name = desc.getAttribute('mwg-rs:Name');
-            var type = desc.getAttribute('mwg-rs:Type');
+// Lire Name et Type depuis les balises enfants
+var nameEl = desc.getElementsByTagName('mwg-rs:Name')[0];
+var typeEl = desc.getElementsByTagName('mwg-rs:Type')[0];
+
+var name = nameEl ? (nameEl.textContent || nameEl.innerHTML) : null;
+var type = typeEl ? (typeEl.textContent || typeEl.innerHTML) : null;
+
+////console.log((('rdf:li', i, '- Name:', name, 'Type:', type);
             
-            //console.log('Description', i, '- Name:', name, 'Type:', type);
+            ////console.log((('Description', i, '- Name:', name, 'Type:', type);
             
             if (name && type === 'Face') {
               // Chercher la balise mwg-rs:Area
@@ -311,12 +317,26 @@ facesData = parseFacesFromXMP(xmpData);
               
               if (areas.length > 0) {
                 var area = areas[0];
-                var x = area.getAttribute('stArea:x');
-                var y = area.getAttribute('stArea:y');
-                var w = area.getAttribute('stArea:w');
-                var h = area.getAttribute('stArea:h');
+               // Essayer d'abord les attributs (format 1)
+var x = area.getAttribute('stArea:x');
+var y = area.getAttribute('stArea:y');
+var w = area.getAttribute('stArea:w');
+var h = area.getAttribute('stArea:h');
+
+// Si pas d'attributs, chercher les balises enfants (format 2)
+if (!x) {
+  var xEl = area.getElementsByTagName('stArea:x')[0] || area.getElementsByTagName('x')[0];
+  var yEl = area.getElementsByTagName('stArea:y')[0] || area.getElementsByTagName('y')[0];
+  var wEl = area.getElementsByTagName('stArea:w')[0] || area.getElementsByTagName('w')[0];
+  var hEl = area.getElementsByTagName('stArea:h')[0] || area.getElementsByTagName('h')[0];
+  
+  if (xEl) x = xEl.textContent || xEl.innerHTML;
+  if (yEl) y = yEl.textContent || yEl.innerHTML;
+  if (wEl) w = wEl.textContent || wEl.innerHTML;
+  if (hEl) h = hEl.textContent || hEl.innerHTML;
+}
                 
-                //console.log('Area:', x, y, w, h);
+                ////console.log((('Area:', x, y, w, h);
                 
                 if (x && y && w && h) {
                   // Vérifier qu'on n'a pas déjà ajouté ce visage (éviter les doublons)
@@ -337,9 +357,9 @@ facesData = parseFacesFromXMP(xmpData);
                       h: parseFloat(h),
                       format: 'mwg-rs'
                     });
-                    //console.log('✓ Visage ajouté (mwg-rs):', name);
+                    //console.log(('✓ Visage ajouté (mwg-rs):', name);
                   } else {
-                    //console.log('⊘ Visage ignoré (doublon):', name);
+                    //console.log(('⊘ Visage ignoré (doublon):', name);
                   }
                 }
               }
@@ -348,23 +368,39 @@ facesData = parseFacesFromXMP(xmpData);
         }
       }
       
-      //console.log('=== Total visages trouvés:', faces.length, '===');
-      //console.log('Détails:', faces);
+      //console.log(('=== Total visages trouvés:', faces.length, '===');
+      //console.log(('Détails:', faces);
       return faces;
     }
 /// 350
 // Transformer les coordonnées selon l'orientation EXIF
 function transformCoordinates(left, top, width, height, orientation) {
   var newLeft, newTop, newWidth, newHeight;
-  console.log('Orientation = ',orientation);
+  //console.log(('Orientation = ',orientation);
   switch(orientation) {
     case 1: // Normal
       return {left: left, top: top, width: width, height: height};
+
+    case 2: // Flip horizontal
+          newLeft = 100 - left - width;
+          return {left: newLeft, top: top, width: width, height: height};  
       
     case 3: // Rotate 180
       newLeft = 100 - left - width;
       newTop = 100 - top - height;
       return {left: newLeft, top: newTop, width: width, height: height};
+
+            case 4: // Flip vertical
+          newTop = 100 - top - height;
+          return {left: left, top: newTop, width: width, height: height};  
+
+      case 5: // Rotate 90 CW + Flip horizontal
+          // Transformation : x' = y, y' = x
+          newLeft = top;
+          newTop = left;
+          newWidth = height;
+          newHeight = width;
+          return {left: newLeft, top: newTop, width: newWidth, height: newHeight};      
       
     case 6: // Rotate 90 CW
     // Pour afficher correctement après rotation
@@ -374,13 +410,13 @@ function transformCoordinates(left, top, width, height, orientation) {
     newHeight = width;
     return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
       
-    case 8: // Rotate 90 CCW (270 CW)
-      // Transformation : x' = 100 - y - height, y' = x
-      newLeft = 100 - top - height;
-      newTop = left;
-      newWidth = height;
-      newHeight = width;
-      return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
+  case 8: // Rotate 90 CCW (270 CW)
+  // Transformation : x' = 100 - y - height, y' = x
+  newLeft = 100 - top - height;
+  newTop = left;
+  newWidth = height;
+  newHeight = width;
+  return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
       
     default:
       return {left: left, top: top, width: width, height: height};
@@ -405,8 +441,8 @@ function transformCoordinates(left, top, width, height, orientation) {
         return;
       }
       
-      //console.log('DEBUG - $img:', $img);
-      //console.log('DEBUG - Tag:', $img[0].tagName);
+      //console.log(('DEBUG - $img:', $img);
+      //console.log(('DEBUG - Tag:', $img[0].tagName);
       
 var $container = $img.parent();
 
@@ -433,16 +469,16 @@ if (!$parentContainer.hasClass('facetag-wrapper')) {
       var displayWidth = $img.width();
       var displayHeight = $img.height();
       
-      //console.log('=== Affichage des visages ===');
-      //console.log('Image RÉELLE - Largeur:', naturalWidth, 'Hauteur:', naturalHeight);
-      //console.log('Image AFFICHÉE - Largeur:', displayWidth, 'Hauteur:', displayHeight);
+      //console.log(('=== Affichage des visages ===');
+      //console.log(('Image RÉELLE - Largeur:', naturalWidth, 'Hauteur:', naturalHeight);
+      //console.log(('Image AFFICHÉE - Largeur:', displayWidth, 'Hauteur:', displayHeight);
       
       $.each(faces, function(index, face) {
         var left, top, width, height;
         
-        //console.log('--- Visage:', face.name, '---');
-        //console.log('Format:', face.format);
-        //console.log('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
+        //console.log(('--- Visage:', face.name, '---');
+        //console.log(('Format:', face.format);
+        //console.log(('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
         
         if (face.format === 'mpreg') {
           // Format MPReg: x,y sont le COIN SUPÉRIEUR GAUCHE
@@ -451,7 +487,7 @@ if (!$parentContainer.hasClass('facetag-wrapper')) {
           width = face.w * 100;
           height = face.h * 100;
           
-          //console.log('MPReg - Coin supérieur gauche direct');
+          //console.log(('MPReg - Coin supérieur gauche direct');
         } else {
           // Format mwg-rs: x,y sont le CENTRE
           left = (face.x - face.w / 2) * 100;
@@ -459,7 +495,7 @@ if (!$parentContainer.hasClass('facetag-wrapper')) {
           width = face.w * 100;
           height = face.h * 100;
           
-          //console.log('mwg-rs - Centre converti en coin supérieur gauche');
+          //console.log(('mwg-rs - Centre converti en coin supérieur gauche');
         }
 
         /// 391-416
@@ -471,7 +507,7 @@ top = transformed.top;
 width = transformed.width;
 height = transformed.height;
         
-        console.log('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
+        //console.log(('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
         
         // Convertir la couleur hexa en rgba avec opacité
           function hexToRgba(hex, opacity) {
@@ -553,10 +589,10 @@ function hexToRgba(hex, opacity) {
  // MODE PERSISTENT : afficher automatiquement si activé
 if (displayMode === 'persistent') {
   var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
-  //console.log('Vérification mode persistant:', isPersistentActive);
+  //console.log(('Vérification mode persistant:', isPersistentActive);
   
   if (isPersistentActive) {
-    //console.log('Mode persistant activé - chargement automatique des visages');
+    //console.log(('Mode persistant activé - chargement automatique des visages');
     $('#facetag_show_faces').addClass('facetag-active');
     
     // Charger et afficher automatiquement les visages
@@ -572,7 +608,7 @@ if (displayMode === 'persistent') {
           xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
 facesData = parseFacesFromXMP(xmpData);
           
-          //console.log('Visages trouvés (auto):', facesData.length);
+          //console.log(('Visages trouvés (auto):', facesData.length);
           
           if (facesData.length > 0) {
             displayFaces(facesData);

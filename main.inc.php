@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.6
+Version: 1.7
 Description: afficher les visages tagués avec digiKam
 Plugin URI: https://fr.piwigo.org/ext/index.php?eid=1051
 Author: Charles69
@@ -11,29 +11,32 @@ Has Settings: webmaster
 
 // ============  VERSIONS =========================================================
  // historique des versions
- /*
-     
- version 1.6 - 25/11/2025
+/*
+version 1.7 - 30/11/2025
+    corrigé : lecture des visages créés par xnview
+    orientation 8 corrigé , ajouté orientation 2,3,4
+
+version 1.6 - 25/11/2025
     ajouté support orientation EXIF pour photos en mode portrait
     corrigé orientation type6 = 90 CW
  
- version 1.5 - 20/11/2025
+version 1.5 - 20/11/2025
     corrigé conflit avec l'absence de super_zoom
  
- version 1.4 - 16/11/2025
+version 1.4 - 16/11/2025
     corrigé jQuery non chargé dans certaines configurations
     testé avec les thèmes Bootstrap_Darkroom, Modus et Elegant
     
- version 1.3 - 16/11/2025
+version 1.3 - 16/11/2025
     paramètres ajout bouton valeurs par défaut
     correction taduction uk
     changement couleur sur bouton toggle
     console.log en remarques
     
-  version 1.2 - 15/11/2025
+version 1.2 - 15/11/2025
     erreur dans maintain.inc.php
 
-  version 1.1 - 15/11/2025
+version 1.1 - 15/11/2025
     modifé les paramétres par défaut - fichier de paramétres config_defaut.php
     ajouté Plugin URI
 
