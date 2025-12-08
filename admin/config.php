@@ -85,6 +85,7 @@ $template->assign(array(
 
 // Charger le template
 $template->set_filename('face_tag_config', dirname(__FILE__).'/../template/config.tpl');
+//$template->set_filename('face_tag_config',FACETAG_PATH . 'template/config.tpl');
 $template->assign_var_from_handle('ADMIN_CONTENT', 'face_tag_config');
 
 //---------------------------------------------------------------------

@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.7
-Description: afficher les visages tagués avec digiKam
-Plugin URI: https://fr.piwigo.org/ext/index.php?eid=1051
+Version: 1.8A
+Description: afficher les visages tagués avec face_tag_editor et autres
+Plugin URI: https://piwigo.org/ext/extension_view.php?eid=1051
 Author: Charles69
 Author URI:
 Has Settings: webmaster
@@ -12,6 +12,13 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
 /*
+version 1.8A - en cours
+    corrigé page configuration
+
+version 1.8 - 04/12/2025 - diffusé
+    si PHP Imagick n'est pas actif , External Magick est utilisé , sinon message d'avertissement
+    modification des icones en svg
+    
 version 1.7 - 30/11/2025
     corrigé : lecture des visages créés par xnview
     orientation 8 corrigé , ajouté orientation 2,3,4
@@ -138,7 +145,7 @@ function facetag_picture_toolbar()
   
   // Construire l'URL du bouton (AJAX)
   $ajax_url = get_root_url() . 'ws.php?format=json&method=facetag.getXMP&image_id=' . $picture['current']['id'];
-  $icon = get_root_url() . 'plugins/' . FACETAG_ID . '/images/face.png';
+  $icon = get_root_url() . 'plugins/' . FACETAG_ID . '/images/face.svg';
   
   // Assigner les variables au template 
   
@@ -245,51 +252,120 @@ WHERE id = ' . intval($params['image_id']);
 // Fonction d'extraction des XMP avec Imagick
 function facetag_extract_xmp($image_path)
 {
-  if (!extension_loaded('imagick'))
+  // Essayer d'abord avec l'extension PHP Imagick
+  if (extension_loaded('imagick'))
   {
-    return array('error' => 'Imagick extension not loaded');
-  }
-  
-  try
-  {
-    $imagick = new Imagick($image_path);
-    
-    // Récupérer toutes les propriétés
-    $properties = $imagick->getImageProperties();
-    
-    $xmp_data = array();
-    
-    // Extraire les données XMP
-    foreach ($properties as $key => $value)
+    try
     {
-      // On récupère toutes les propriétés qui commencent par xmp, exif, etc.
-      if (strpos($key, 'xmp:') === 0 || 
-          strpos($key, 'exif:') === 0 || 
-          strpos($key, 'dc:') === 0 ||
-          strpos($key, 'Iptc4xmpCore:') === 0 ||
-          strpos($key, 'mwg-rs:') === 0 ||
-          strpos($key, 'MP:') === 0)
+      $imagick = new Imagick($image_path);
+
+      // Récupérer toutes les propriétés
+      $properties = $imagick->getImageProperties();
+
+      $xmp_data = array();
+
+      // Extraire les données XMP
+      foreach ($properties as $key => $value)
       {
+        // On récupère toutes les propriétés qui commencent par xmp, exif, etc.
+        if (strpos($key, 'xmp:') === 0 ||
+            strpos($key, 'exif:') === 0 ||
+            strpos($key, 'dc:') === 0 ||
+            strpos($key, 'Iptc4xmpCore:') === 0 ||
+            strpos($key, 'mwg-rs:') === 0 ||
+            strpos($key, 'MP:') === 0)
+        {
+          $xmp_data[$key] = $value;
+        }
+      }
+
+      // Récupérer aussi le profil XMP brut si disponible
+      $xmp_profile = $imagick->getImageProfile('xmp');
+      if ($xmp_profile)
+      {
+        $xmp_data['_raw_xmp'] = $xmp_profile;
+      }
+
+      $imagick->clear();
+      $imagick->destroy();
+
+      return $xmp_data;
+    }
+    catch (Exception $e)
+    {
+      return array('error' => $e->getMessage());
+    }
+  }
+
+  // Fallback : essayer avec la commande externe ImageMagick
+  return facetag_extract_xmp_external($image_path);
+}
+
+// Fonction d'extraction des XMP avec la commande externe ImageMagick
+function facetag_extract_xmp_external($image_path)
+{
+  // Essayer de trouver l'exécutable ImageMagick
+  $magick_commands = array('magick', 'convert', 'magick.exe', 'convert.exe');
+  $magick_cmd = null;
+
+  foreach ($magick_commands as $cmd)
+  {
+    // Tester si la commande existe
+    $test = shell_exec($cmd . ' -version 2>&1');
+    if ($test && (stripos($test, 'ImageMagick') !== false || stripos($test, 'GraphicsMagick') !== false))
+    {
+      $magick_cmd = $cmd;
+      break;
+    }
+  }
+
+  if (!$magick_cmd)
+  {
+    return array('error' => 'Ni l\'extension PHP Imagick ni la commande externe ImageMagick ne sont disponibles');
+  }
+
+  // Extraire le profil XMP avec la commande externe
+  $escaped_path = escapeshellarg($image_path);
+  $xmp_data = array();
+
+  // Extraire le profil XMP brut
+  $command = $magick_cmd . ' ' . $escaped_path . ' -print "%[xmp:*]" null: 2>&1';
+  $output = shell_exec($command);
+
+  if ($output)
+  {
+    // Parser les propriétés XMP
+    $lines = explode("\n", $output);
+    foreach ($lines as $line)
+    {
+      $line = trim($line);
+      if (empty($line)) continue;
+
+      // Format attendu : "xmp:PropertyName=value"
+      if (preg_match('/^([^=]+)=(.*)$/', $line, $matches))
+      {
+        $key = trim($matches[1]);
+        $value = trim($matches[2]);
         $xmp_data[$key] = $value;
       }
     }
-    
-    // Récupérer aussi le profil XMP brut si disponible
-    $xmp_profile = $imagick->getImageProfile('xmp');
-    if ($xmp_profile)
-    {
-      $xmp_data['_raw_xmp'] = $xmp_profile;
-    }
-    
-    $imagick->clear();
-    $imagick->destroy();
-    
-    return $xmp_data;
   }
-  catch (Exception $e)
+
+  // Extraire le profil XMP complet
+  $command = $magick_cmd . ' ' . $escaped_path . ' xmp:- 2>&1';
+  $xmp_profile = shell_exec($command);
+
+  if ($xmp_profile && stripos($xmp_profile, '<?xpacket') !== false)
   {
-    return array('error' => $e->getMessage());
+    $xmp_data['_raw_xmp'] = $xmp_profile;
   }
+
+  if (empty($xmp_data))
+  {
+    return array('error' => 'Aucune donnée XMP trouvée avec la commande externe');
+  }
+
+  return $xmp_data;
 }
 
 

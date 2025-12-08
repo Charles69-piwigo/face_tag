@@ -5,7 +5,13 @@ if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 // Installation du plugin avec les valeurs par défaut
 function plugin_install()
 {
-    
+
+}
+
+// Activation du plugin
+function plugin_activate($plugin_id, $plugin_version, &$errors)
+{
+
 }
 
 // Désinstallation du plugin

@@ -58,6 +58,12 @@
         dataType: 'json',
         success: function(data) {
           if (data.stat === 'ok' && data.result.xmp) {
+            // Vérifier si une erreur est survenue
+            if (data.result.xmp.error) {
+              showXmpModal('<div style="color:red; padding:20px;">Erreur : ' + data.result.xmp.error + '</div>');
+              return;
+            }
+
             xmpData = data.result.xmp;                   /// 61
             xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
 displayXmpData(xmpData);
@@ -99,7 +105,7 @@ displayXmpData(xmpData);
         if (data._raw_xmp) {
           html += '<hr style="margin:20px 0;">';
           html += '<h4>XMP Brut:</h4>';
-          html += '<pre style="background:#f5f5f5; padding:10px; overflow-x:auto; font-size:11px; max-height:300px;">' + escapeHtml(data._raw_xmp) + '</pre>';
+          html += '<pre style="background:#f5f5f5; padding:10px; overflow-x:auto; font-size:14px; max-height:300px;">' + escapeHtml(data._raw_xmp) + '</pre>';
         }
       }
       
@@ -112,8 +118,8 @@ displayXmpData(xmpData);
     function showXmpModal(content) {
       // Supprimer les modaux existants
       $('#xmp_modal, #xmp_overlay').remove();
-      
-      var modal = '<div id="xmp_modal" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:2px solid #ccc; z-index:10000; max-width:80%; max-height:80%; overflow:auto; box-shadow:0 0 20px rgba(0,0,0,0.5); border-radius:5px;">';
+
+      var modal = '<div id="xmp_modal" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:2px solid #ccc; z-index:10000; max-width:80%; max-height:80%; overflow:auto; box-shadow:0 0 20px rgba(0,0,0,0.5); border-radius:5px; color:black;">';
       modal += content;
       modal += '<div style="text-align:center; margin-top:20px;"><button id="close_xmp_modal" style="padding:8px 20px; cursor:pointer; background:#333; color:white; border:none; border-radius:3px;">Fermer</button></div>';
       modal += '</div>';
@@ -194,13 +200,20 @@ $(document).on('click', '#facetag_show_faces', function(e) {
     dataType: 'json',
     success: function(data) {
       if (data.stat === 'ok' && data.result.xmp) {
+        // Vérifier si une erreur est survenue
+        if (data.result.xmp.error) {
+          alert('Erreur : ' + data.result.xmp.error);
+          $button.removeClass('facetag-active');
+          return;
+        }
+
         xmpData = data.result.xmp;                        //196
        xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
 facesData = parseFacesFromXMP(xmpData);
-        
+
         //console.log(('XMP data:', xmpData);
         //console.log(('Visages trouvés:', facesData);
-        
+
         if (facesData.length > 0) {
           displayFaces(facesData);
         } else {

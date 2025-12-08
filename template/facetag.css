@@ -18,46 +18,31 @@
   border-color: #777777;
 }
 
-/* Fond vert uniquement sur l’icône */
+/* Style de l'icône XMP */
 #facetag_show_xmp img {
-  background-color: #dd1717;
   border-radius: 3px;
   width: 22px;
   height: 22px;
-  padding: 2px;                  /* crée un petit carré */
+  padding: 2px;
   vertical-align: middle;
   margin-right: 5px;
+  filter: invert(23%) sepia(91%) saturate(6207%) hue-rotate(352deg) brightness(89%) contrast(88%);
 }
 
 /* ==================================================================*/
 /* Boutons Face Tag FACE */
-#facetag_show_faces {
-  display: inline-flex;
-  align-items: center;
-  background: none;              /* plus de fond vert sur tout le bouton */
-  color: #ffffff;
-  padding: 5px;
-  border-radius: 1px;
-  text-decoration: none;
- /* border: 1px solid #555555; */
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
 
-#facetag_show_faces:hover {
-  background-color: #555555;
-  border-color: #777777;
-}
-
-/* Fond vert uniquement sur l’icône */
+/* Style de l'icône Faces */
 #facetag_show_faces img {
-  background-color: #3e5c9c;
   border-radius: 3px;
   width: 22px;
   height: 22px;
-  padding: 2px;                  /* crée un petit carré vert */
+  padding: 2px;
   vertical-align: middle;
   margin-right: 5px;
+  /*filter: invert(33%) sepia(56%) saturate(1163%) hue-rotate(188deg) brightness(90%) contrast(91%);*/
+  filter: invert(100%) ;
+
 }
 
 
@@ -71,7 +56,7 @@
 
 /* Icône en état actif (vert plus clair) */
 #facetag_show_faces.facetag-active img {
-  background-color: #66bb6a !important;
+  filter: invert(65%) sepia(53%) saturate(422%) hue-rotate(75deg) brightness(95%) contrast(87%) !important;
 }
 
 /* Overlays des visages */

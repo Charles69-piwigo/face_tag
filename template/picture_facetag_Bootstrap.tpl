@@ -17,14 +17,14 @@ var facetag_config = {
 
 {if $FACETAG_SHOW_XMP}
 <a id="facetag_show_xmp" href="#" data-ajax-url="{$FACETAG_AJAX_URL}" title="{'Voir les métadonnées XMP'|@translate}" class="btn btn-default">
-  <img src="{$FACETAG_ICON}" alt="XMP">
+  <img src="{$FACETAG_ICON}" alt="XMP" style="width:22px; height:22px; vertical-align:middle;">
   <span class="pwg-button-text">XMP</span>
 </a>
 {/if}
 
 {if $FACETAG_SHOW_FACES}
 <a id="facetag_show_faces" href="#" data-ajax-url="{$FACETAG_AJAX_URL}" title="{'Afficher les visages tagués'|@translate}" class="btn btn-default">
-  <img src="{$FACETAG_ICON}" alt="Faces">
+  <img src="{$FACETAG_ICON}" alt="Faces" style="width:22px; height:22px; vertical-align:middle;">
   <span class="pwg-button-text">Visages</span>
 </a>
 {/if}

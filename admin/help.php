@@ -7,5 +7,6 @@ facetag_admin_tabsheet('help');
 
 // Charger le template
 $template->set_filename('face_tag_help', dirname(__FILE__).'/../template/help.tpl');
+//$template->set_filename('face_tag_help', FACETAG_PATH . 'template/help.tpl');
 $template->assign_var_from_handle('ADMIN_CONTENT', 'face_tag_help');
 ?>
