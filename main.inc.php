@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.8A
+Version: 1.9C
 Description: afficher les visages tagués avec face_tag_editor et autres
 Plugin URI: https://piwigo.org/ext/extension_view.php?eid=1051
 Author: Charles69
@@ -12,6 +12,17 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
 /*
+version 1.9C - en cours 16/12/2025
+    corrigé erreur sur orientation 8 - 270CW
+    modifié alignement des icones sur modus + css
+    
+version 1.9 - 10/12/2025 diffusée
+    REFONTE COMPLÈTE - Approche REGEX au lieu de parsing XML DOM
+    Extraction directe du segment XMP + regex simples
+    
+version 1.9 - 09/12/2025 (non diffusée)
+    tentative support format Lightroom (bugs)
+    
 version 1.8A - en cours
     corrigé page configuration
 
@@ -48,7 +59,6 @@ version 1.1 - 15/11/2025
     ajouté Plugin URI
 
   version 1.0 - 14/11/2025
-  
 */
 //=================================================================================
 
@@ -67,60 +77,61 @@ if (basename(dirname(__FILE__)) != 'face_tag')
 
 // Plugin constants
 global $prefixeTable;
-define('FACETAG_ID', basename(dirname(__FILE__)));    // nom du répertoire du plugin
-define('FACETAG_PATH', PHPWG_PLUGINS_PATH . FACETAG_ID . '/'); // ./plugins/face_tag/
-define('FACETAG_TABLE', $prefixeTable . 'facetag'); // piwigo_facetag
-define('FACETAG_ADMIN', get_root_url() . 'admin.php?page=plugin-' . FACETAG_ID); // admin.php?page=plugin-face_tag
+define('FACETAG_ID', basename(dirname(__FILE__)));
+define('FACETAG_PATH', PHPWG_PLUGINS_PATH . FACETAG_ID . '/');
+define('FACETAG_TABLE', $prefixeTable . 'facetag');
+define('FACETAG_ADMIN', get_root_url() . 'admin.php?page=plugin-' . FACETAG_ID);
 define('FACETAG_PUBLIC', get_absolute_root_url() . make_index_url(array('section' => 'face_tag')) . '/');
-    // https://nom_nas.synology.me/photodev/index.php?/face_tag/
-define('FACETAG_DIR', PHPWG_ROOT_PATH . PWG_LOCAL_DIR . 'face_tag/'); // ./local/face_tag/
+define('FACETAG_DIR', PHPWG_ROOT_PATH . PWG_LOCAL_DIR . 'face_tag/');
 
+// ==================== CHARGER LA BIBLIOTHÈQUE XMP v2.0 ====================
+require_once(FACETAG_PATH . 'lib/face_xmp_extraction.php');
 
-// SCRIPT =======================================================================================
-
-add_event_handler('loc_begin_page_header', 'facetag_load_jquery');
-function facetag_load_jquery()
-{
-    global $template;
-    
-    // Charger jQuery seulement s'il n'est pas déjà chargé
-    $template->append('head_elements', '
-    <script type="text/javascript">
-        if (typeof jQuery === "undefined") {
-            document.write(\'<script type="text/javascript" src="' . get_root_url() . 'themes/default/js/jquery.min.js"><\/script>\');
-        }
-    </script>
-    ');
-    
-}
-
-add_event_handler('loc_end_page_tail', 'facetag_add_extension');
-function facetag_add_extension()
-{
-    global $page, $template;
-    
-    $template->append('footer_elements', '
-    <link rel="stylesheet" href="plugins/face_tag/template/facetag.css">
-    <script src="plugins/face_tag/facetag.js"></script>
-    ');
-}
-
-// fin SCRIPT ==================================================================================
-
-
-// initialisation du plugin ======================================================
+// ==================== INITIALISATION ====================
 add_event_handler('init', 'facetag_init');
 
+function facetag_init()
+{
+  load_language('plugin.lang', FACETAG_PATH);
+}
 
+// ==================== CHARGER JQUERY ====================
+add_event_handler('loc_begin_page_header', 'facetag_load_jquery');
 
-// Bouton dans la barre de navigation de ThePicturePage  =========================
+function facetag_load_jquery()
+{
+  global $template;
+  
+  // Charger jQuery seulement s'il n'est pas déjà chargé
+  $template->append('head_elements', '
+  <script type="text/javascript">
+    if (typeof jQuery === "undefined") {
+      document.write(\'<script type="text/javascript" src="' . get_root_url() . 'themes/default/js/jquery.min.js"><\/script>\');
+    }
+  </script>
+  ');
+}
 
-// Ajouter le bouton dans la barre de navigation de la page photo
+// ==================== CHARGER CSS ET JS ====================
+add_event_handler('loc_end_page_tail', 'facetag_add_extension');
+
+function facetag_add_extension()
+{
+  global $template;
+  
+  $template->append('footer_elements', '
+  <link rel="stylesheet" href="plugins/face_tag/template/facetag.css">
+  <script src="plugins/face_tag/facetag.js"></script>
+  ');
+}
+
+// ==================== BOUTON DANS LA BARRE DE NAVIGATION ====================
 add_event_handler('loc_end_picture', 'facetag_picture_toolbar');
+
 function facetag_picture_toolbar()
 {
   global $template, $user, $picture;
-
+  
   // Charger les valeurs par défaut
   include(dirname(__FILE__) . '/install/config_defaut.php'); 
   
@@ -131,10 +142,8 @@ function facetag_picture_toolbar()
   if (!is_array($config)) {
     $config = $config_defaut;
   } else {
-    $config = array_merge($config_defaut, $config);  // gestion de la modif des config
+    $config = array_merge($config_defaut, $config);
   }
-  
-  //echo "boutons = ",$config['show_xmp_button'] , $config['show_faces_button'] ;
   
   // Ne rien afficher si les deux boutons sont désactivés
   if (!$config['show_xmp_button'] && !$config['show_faces_button']) {
@@ -147,8 +156,7 @@ function facetag_picture_toolbar()
   $ajax_url = get_root_url() . 'ws.php?format=json&method=facetag.getXMP&image_id=' . $picture['current']['id'];
   $icon = get_root_url() . 'plugins/' . FACETAG_ID . '/images/face.svg';
   
-  // Assigner les variables au template 
-  
+  // Assigner les variables au template
   $template->assign(array(
     'FACETAG_AJAX_URL' => $ajax_url,
     'FACETAG_ICON' => $icon,
@@ -157,16 +165,14 @@ function facetag_picture_toolbar()
     'FACETAG_SHOW_FACES' => (bool)$config['show_faces_button'],
     'FACETAG_DISPLAY_MODE' => isset($config['faces_display_mode']) ? $config['faces_display_mode'] : $config_defaut['faces_display_mode'],
     'FACETAG_RECT_COLOR' => isset($config['rect_color']) ? $config['rect_color'] : $config_defaut['rect_color'],
-    'FACETAG_RECT_WIDTH' => isset($config['rect_width']) ? $config['rect_width'] : $config_defaut['rect_width'] ,
+    'FACETAG_RECT_WIDTH' => isset($config['rect_width']) ? $config['rect_width'] : $config_defaut['rect_width'],
     'FACETAG_RECT_OPACITY' => isset($config['rect_opacity']) ? $config['rect_opacity'] : $config_defaut['rect_opacity'],
     'FACETAG_LABEL_TEXT_COLOR' => isset($config['label_text_color']) ? $config['label_text_color'] : $config_defaut['label_text_color'],
     'FACETAG_LABEL_FONT_SIZE' => isset($config['label_font_size']) ? $config['label_font_size'] : $config_defaut['label_font_size'],
     'FACETAG_LABEL_BG_COLOR' => isset($config['label_bg_color']) ? $config['label_bg_color'] : $config_defaut['label_bg_color'],
     'FACETAG_LABEL_BG_OPACITY' => isset($config['label_bg_opacity']) ? $config['label_bg_opacity'] : $config_defaut['label_bg_opacity'],
-
   ));
   
-
   // Choix du template selon le thème
   if ($user['theme'] == 'bootstrapdefault' || $user['theme'] == 'bootstrap_darkroom') {
     $tpl_file = 'picture_facetag_Bootstrap.tpl';
@@ -179,9 +185,7 @@ function facetag_picture_toolbar()
   $template->concat('PLUGIN_PICTURE_ACTIONS', $template->parse('facetag_button', true));
 }
 
-// Récuperation des XMP  du jpg ==============================================================================
-
-// Web Service pour récupérer les XMP
+// ==================== WEB SERVICE ====================
 add_event_handler('ws_add_methods', 'facetag_ws_add_methods');
 
 function facetag_ws_add_methods($arr)
@@ -228,153 +232,15 @@ WHERE id = ' . intval($params['image_id']);
     return new PwgError(404, 'Image file not found');
   }
   
-  // Extraire les XMP avec Imagick
-  $xmp_data = facetag_extract_xmp($image_path);
-  
-  // Récupérer l'orientation EXIF
-  $orientation = 1; // Valeur par défaut (normal)
-  if (function_exists('exif_read_data')) {
-    $exif = @exif_read_data($image_path);
-    if ($exif && isset($exif['Orientation'])) {
-      $orientation = $exif['Orientation'];
-    }
-  }
+  // === EXTRACTION v2.0 : Utiliser la bibliothèque ===
+  $data = facetag_lib_extract_faces_data($image_path);
   
   return array(
-    'xmp' => $xmp_data,
     'image_id' => $params['image_id'],
-    'orientation' => $orientation
+    'wjpg' => $data['wjpg'],
+    'hjpg' => $data['hjpg'],
+    'orientation' => $data['or'],
+    'faces' => $data['faces']
   );
 }
-
-//=====================================================================================
-
-// Fonction d'extraction des XMP avec Imagick
-function facetag_extract_xmp($image_path)
-{
-  // Essayer d'abord avec l'extension PHP Imagick
-  if (extension_loaded('imagick'))
-  {
-    try
-    {
-      $imagick = new Imagick($image_path);
-
-      // Récupérer toutes les propriétés
-      $properties = $imagick->getImageProperties();
-
-      $xmp_data = array();
-
-      // Extraire les données XMP
-      foreach ($properties as $key => $value)
-      {
-        // On récupère toutes les propriétés qui commencent par xmp, exif, etc.
-        if (strpos($key, 'xmp:') === 0 ||
-            strpos($key, 'exif:') === 0 ||
-            strpos($key, 'dc:') === 0 ||
-            strpos($key, 'Iptc4xmpCore:') === 0 ||
-            strpos($key, 'mwg-rs:') === 0 ||
-            strpos($key, 'MP:') === 0)
-        {
-          $xmp_data[$key] = $value;
-        }
-      }
-
-      // Récupérer aussi le profil XMP brut si disponible
-      $xmp_profile = $imagick->getImageProfile('xmp');
-      if ($xmp_profile)
-      {
-        $xmp_data['_raw_xmp'] = $xmp_profile;
-      }
-
-      $imagick->clear();
-      $imagick->destroy();
-
-      return $xmp_data;
-    }
-    catch (Exception $e)
-    {
-      return array('error' => $e->getMessage());
-    }
-  }
-
-  // Fallback : essayer avec la commande externe ImageMagick
-  return facetag_extract_xmp_external($image_path);
-}
-
-// Fonction d'extraction des XMP avec la commande externe ImageMagick
-function facetag_extract_xmp_external($image_path)
-{
-  // Essayer de trouver l'exécutable ImageMagick
-  $magick_commands = array('magick', 'convert', 'magick.exe', 'convert.exe');
-  $magick_cmd = null;
-
-  foreach ($magick_commands as $cmd)
-  {
-    // Tester si la commande existe
-    $test = shell_exec($cmd . ' -version 2>&1');
-    if ($test && (stripos($test, 'ImageMagick') !== false || stripos($test, 'GraphicsMagick') !== false))
-    {
-      $magick_cmd = $cmd;
-      break;
-    }
-  }
-
-  if (!$magick_cmd)
-  {
-    return array('error' => 'Ni l\'extension PHP Imagick ni la commande externe ImageMagick ne sont disponibles');
-  }
-
-  // Extraire le profil XMP avec la commande externe
-  $escaped_path = escapeshellarg($image_path);
-  $xmp_data = array();
-
-  // Extraire le profil XMP brut
-  $command = $magick_cmd . ' ' . $escaped_path . ' -print "%[xmp:*]" null: 2>&1';
-  $output = shell_exec($command);
-
-  if ($output)
-  {
-    // Parser les propriétés XMP
-    $lines = explode("\n", $output);
-    foreach ($lines as $line)
-    {
-      $line = trim($line);
-      if (empty($line)) continue;
-
-      // Format attendu : "xmp:PropertyName=value"
-      if (preg_match('/^([^=]+)=(.*)$/', $line, $matches))
-      {
-        $key = trim($matches[1]);
-        $value = trim($matches[2]);
-        $xmp_data[$key] = $value;
-      }
-    }
-  }
-
-  // Extraire le profil XMP complet
-  $command = $magick_cmd . ' ' . $escaped_path . ' xmp:- 2>&1';
-  $xmp_profile = shell_exec($command);
-
-  if ($xmp_profile && stripos($xmp_profile, '<?xpacket') !== false)
-  {
-    $xmp_data['_raw_xmp'] = $xmp_profile;
-  }
-
-  if (empty($xmp_data))
-  {
-    return array('error' => 'Aucune donnée XMP trouvée avec la commande externe');
-  }
-
-  return $xmp_data;
-}
-
-
-//================================================================================
-// fonction d'initialisation du plugin
-function facetag_init()
-{
-  // language
-load_language('plugin.lang', FACETAG_PATH);
-}
-//==================================
 ?>

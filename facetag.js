@@ -1,12 +1,10 @@
-
-// Face Tag - JavaScript
+// Face Tag v2.0 - JavaScript SIMPLIFIÉ
 
 (function($) {
   'use strict';
   
   $(document).ready(function() {
     
-    var xmpData = null;
     var facesData = null;
     var facesVisible = false;
     var displayMode = window.facetag_display_mode || 'toggle'; 
@@ -21,619 +19,385 @@
           label_bg_opacity: 0.8
     };
 
-
-/*
-//console.log(('=== DEBUG MODE ===');
-//console.log(('window.facetag_display_mode:', window.facetag_display_mode);
-//console.log(('displayMode final:', displayMode);
-//console.log(('localStorage facetag_persistent_mode:', localStorage.getItem('facetag_persistent_mode'));
-//console.log(('==================');
-//console.log(('Face Tag JS chargé');
-//console.log(('Mode d affichage:', displayMode); 
-//console.log(('Bouton XMP:', $('#facetag_show_xmp').length);
-//console.log(('Bouton Faces:', $('#facetag_show_faces').length);
-*/    
+    console.log('Face Tag v2.0 chargé - Mode:', displayMode);
     
-    // ==================== BOUTON 1 : AFFICHER LES XMP ====================
-    $(document).on('click', '#facetag_show_xmp', function(e) {
+    // ==================== BOUTON : AFFICHER LES VISAGES ====================
+    $(document).on('click', '#facetag_show_faces', function(e) {
       e.preventDefault();
-      //console.log(('Clic sur bouton XMP');
+      console.log('Clic sur bouton Visages');
       
       var ajaxUrl = $(this).data('ajax-url');
-      //console.log(('AJAX URL:', ajaxUrl);
       
-      // Si on a déjà les données, on les affiche
-      if (xmpData) {
-        displayXmpData(xmpData);
+      // MODE PERSISTENT : vérifier le localStorage
+      if (displayMode === 'persistent') {
+        var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
+        
+        if (isPersistentActive) {
+          // Désactiver le mode persistant
+          localStorage.setItem('facetag_persistent_mode', 'false');
+          hideFaces();
+          $(this).removeClass('facetag-active');
+          return;
+        } else {
+          // Activer le mode persistant
+          localStorage.setItem('facetag_persistent_mode', 'true');
+          $(this).addClass('facetag-active');
+        }
+
+      } else {
+        // MODE TOGGLE : comportement actuel
+        if (facesVisible) {
+          hideFaces();
+          $(this).removeClass('facetag-active');
+          return;
+        } else {
+          $(this).addClass('facetag-active');
+        }
+      }
+      
+
+      // Si on a déjà les données, on affiche directement
+      if (facesData) {
+        console.log('Utilisation des données en cache');
+        displayFaces(facesData);
         return;
       }
       
-      // Afficher un message de chargement
-      showXmpModal('<div style="text-align:center; padding:20px;">Chargement des données XMP...</div>');
+      // Sinon on charge les données via AJAX
+      var $button = $(this);
       
-      // Récupérer les données XMP via AJAX
       $.ajax({
         url: ajaxUrl,
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-          if (data.stat === 'ok' && data.result.xmp) {
-            // Vérifier si une erreur est survenue
-            if (data.result.xmp.error) {
-              showXmpModal('<div style="color:red; padding:20px;">Erreur : ' + data.result.xmp.error + '</div>');
-              return;
-            }
+          console.log('Réponse AJAX:', data);
+          
+          if (data.stat === 'ok' && data.result) {
+            facesData = data.result;
+            
+            console.log('=== DONNÉES REÇUES ===');
+            console.log('Dimensions:', facesData.wjpg, 'x', facesData.hjpg);
+            console.log('Orientation:', facesData.orientation);
+            console.log('Visages:', facesData.faces.length);
+            console.log('Détails:', facesData.faces);
 
-            xmpData = data.result.xmp;                   /// 61
-            xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
-displayXmpData(xmpData);
-          } else if (data.result && data.result.error) {
-            showXmpModal('<div style="color:red; padding:10px;">Erreur: ' + data.result.error + '</div>');
+            if (facesData.faces && facesData.faces.length > 0) {
+              displayFaces(facesData);
+            } else {
+              console.log('Aucun visage trouvé');
+              alert('Aucun visage trouvé dans cette photo');
+              $button.removeClass('facetag-active');
+            }
           } else {
-            showXmpModal('<div style="color:red; padding:10px;">Erreur lors de la récupération des données XMP</div>');
+            console.error('Erreur dans la réponse:', data);
+            alert('Erreur lors de la récupération des données');
+            $button.removeClass('facetag-active');
           }
         },
         error: function(xhr, status, error) {
-          showXmpModal('<div style="color:red; padding:20px;">Erreur de connexion: ' + error + '</div>');
+          console.error('Erreur AJAX:', error);
+          alert('Erreur de connexion: ' + error);
+          $button.removeClass('facetag-active');
         }
       });
     });
     
-    // Fonction pour afficher les données XMP
-    function displayXmpData(data) {
-      var html = '<div style="max-height:600px; overflow-y:auto;">';
-      html += '<h3 style="margin-top:0;">Données XMP</h3>';
+    //------------------------------------------------------------------------------------------------------------------
+    // Afficher les visages sur l'image
+    function displayFaces(data) {
+      console.log('=== AFFICHAGE DES VISAGES ===');
       
-      if (Object.keys(data).length === 0) {
-        html += '<p>Aucune donnée XMP trouvée dans cette image.</p>';
-      } else {
-        html += '<table style="width:100%; font-size:14px; border-collapse:collapse;">';
-        
-        // Afficher les données XMP
-        $.each(data, function(key, value) {
-          if (key !== '_raw_xmp') {
-            html += '<tr style="border-bottom:1px solid #eee;">';
-            html += '<td style="font-weight:bold; padding:8px; vertical-align:top; width:40%;">' + escapeHtml(key) + '</td>';
-            html += '<td style="padding:8px; word-break:break-word;">' + escapeHtml(value) + '</td>';
-            html += '</tr>';
-          }
-        });
-        
-        html += '</table>';
-        
-        // Afficher le XMP brut si disponible
-        if (data._raw_xmp) {
-          html += '<hr style="margin:20px 0;">';
-          html += '<h4>XMP Brut:</h4>';
-          html += '<pre style="background:#f5f5f5; padding:10px; overflow-x:auto; font-size:14px; max-height:300px;">' + escapeHtml(data._raw_xmp) + '</pre>';
-        }
+      // Chercher l'image
+      var $img = $('img#theMainImage, img#theImage, .theMainImage img, .theImage img, #theImage img').first();
+      
+      if ($img.length === 0) {
+        $img = $('#theImage img, #theMainImage img, .row img').first();
       }
       
-      html += '</div>';
+      if ($img.length === 0) {
+        console.error('Image <img> non trouvée !');
+        alert('Image non trouvée');
+        return;
+      }
       
-      showXmpModal(html);
-    }
-    
-    // Fonction pour afficher le modal XMP
-    function showXmpModal(content) {
-      // Supprimer les modaux existants
-      $('#xmp_modal, #xmp_overlay').remove();
-
-      var modal = '<div id="xmp_modal" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:2px solid #ccc; z-index:10000; max-width:80%; max-height:80%; overflow:auto; box-shadow:0 0 20px rgba(0,0,0,0.5); border-radius:5px; color:black;">';
-      modal += content;
-      modal += '<div style="text-align:center; margin-top:20px;"><button id="close_xmp_modal" style="padding:8px 20px; cursor:pointer; background:#333; color:white; border:none; border-radius:3px;">Fermer</button></div>';
-      modal += '</div>';
+      console.log('Image trouvée:', $img[0].src);
       
-      var overlay = '<div id="xmp_overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999;"></div>';
+      // Wrapper l'image si nécessaire
+      var $container = $img.parent();
+      if (!$container.hasClass('facetag-container')) {
+        $img.wrap('<div class="facetag-container"></div>');
+        $container = $img.parent();
+      }
       
-      $('body').append(overlay + modal);
+      var $parentContainer = $container.parent();
+      if (!$parentContainer.hasClass('facetag-wrapper')) {
+        $container.wrap('<div class="facetag-wrapper"></div>');
+        $parentContainer = $container.parent();
+      }
       
-      // Fermeture du modal
-      $('#xmp_overlay, #close_xmp_modal').click(function() {
-        $('#xmp_modal, #xmp_overlay').remove();
-      });
+      // Supprimer les anciens overlays
+      $('.facetag-overlay').remove();
       
-      // Fermeture avec la touche Escape
-      $(document).on('keyup.xmpmodal', function(e) {
-        if (e.keyCode === 27) { // ESC
-          $('#xmp_modal, #xmp_overlay').remove();
-          $(document).off('keyup.xmpmodal');
-        }
-      });
-    }
-    
-
-
-    // ==================== BOUTON 2 : AFFICHER LES VISAGES ====================
-$(document).on('click', '#facetag_show_faces', function(e) {
-  e.preventDefault();
-  //console.log(('Clic sur bouton Visages');
-  
-  var ajaxUrl = $(this).data('ajax-url');
-  
-  // MODE PERSISTENT : vérifier le localStorage
-  if (displayMode === 'persistent') {
-    var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
-    
-    if (isPersistentActive) {
-      // Désactiver le mode persistant
-      localStorage.setItem('facetag_persistent_mode', 'false');
-      hideFaces();
-      $(this).removeClass('facetag-active');
-      return;
-    } else {
-      // Activer le mode persistant
-      localStorage.setItem('facetag_persistent_mode', 'true');
-      $(this).addClass('facetag-active');
-    }
-  } else {
-    // MODE TOGGLE : comportement actuel
-    if (facesVisible) {
-      hideFaces();
-      $(this).removeClass('facetag-active'); // AJOUT ICI
-      return;
-    } else {
-      $(this).addClass('facetag-active'); // AJOUT ICI
-    }
-  }
-  
-  // Si on a déjà les données XMP, on parse directement
-  if (xmpData) {
-    facesData = parseFacesFromXMP(xmpData);
-    //console.log(('Visages trouvés:', facesData);
-    
-    if (facesData.length > 0) {
-      displayFaces(facesData);
-    } else {
-      // Aucun visage : retirer la classe active
-      $(this).removeClass('facetag-active'); // AJOUT ICI
-    }
-    return;
-  }
-  
-  // Sinon on charge les données XMP d'abord
-  var $button = $(this); // Stocker la référence au bouton
-  
-  $.ajax({
-    url: ajaxUrl,
-    type: 'GET',
-    dataType: 'json',
-    success: function(data) {
-      if (data.stat === 'ok' && data.result.xmp) {
-        // Vérifier si une erreur est survenue
-        if (data.result.xmp.error) {
-          alert('Erreur : ' + data.result.xmp.error);
-          $button.removeClass('facetag-active');
-          return;
-        }
-
-        xmpData = data.result.xmp;                        //196
-       xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
-facesData = parseFacesFromXMP(xmpData);
-
-        //console.log(('XMP data:', xmpData);
-        //console.log(('Visages trouvés:', facesData);
-
-        if (facesData.length > 0) {
-          displayFaces(facesData);
+      // Parcourir chaque visage
+      $.each(data.faces, function(index, face) {
+        console.log('--- Visage', index + 1, ':', face.nom, '---');
+        console.log('Méthode:', face.methode);
+        console.log('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
+        
+        var left, top, width, height;
+        
+        if (face.methode === 'MPReg') {
+          // MPReg: x,y sont le COIN SUPÉRIEUR GAUCHE
+          left = face.x * 100;
+          top = face.y * 100;
+          width = face.w * 100;
+          height = face.h * 100;
+          console.log('MPReg - Coin supérieur gauche direct');
         } else {
-          // Aucun visage : retirer la classe active
-          $button.removeClass('facetag-active'); // AJOUT ICI
+          // MWG-RS (et Lightroom): x,y sont le CENTRE
+          left = (face.x - face.w / 2) * 100;
+          top = (face.y - face.h / 2) * 100;
+          width = face.w * 100;
+          height = face.h * 100;
+          console.log('MWG-RS/Lightroom - Centre converti en coin supérieur gauche');
         }
-      } else {
-        alert('Erreur lors de la récupération des données XMP');
-        $button.removeClass('facetag-active'); // AJOUT ICI
-      }
-    },
-    error: function(xhr, status, error) {
-      alert('Erreur de connexion: ' + error);
-      $button.removeClass('facetag-active'); // AJOUT ICI
+        
+        // Appliquer la transformation selon l'orientation EXIF
+        var orientation = data.orientation || 1;
+        var transformed = transformCoordinates(left, top, width, height, orientation);
+        left = transformed.left;
+        top = transformed.top;
+        width = transformed.width;
+        height = transformed.height;
+        
+        console.log('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 
+                    'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
+        
+        // Créer l'overlay
+        var $overlay = $('<div class="facetag-overlay">')
+          .css({
+            left: left + '%',
+            top: top + '%',
+            width: width + '%',
+            height: height + '%',
+            border: config.rect_width + 'px solid ' + hexToRgba(config.rect_color, config.rect_opacity),
+            boxShadow: '0 0 10px ' + hexToRgba(config.rect_color, config.rect_opacity * 0.5)
+          });
+
+        var labelBgRgba = hexToRgba(config.label_bg_color, config.label_bg_opacity);
+        var paddingVertical = Math.max(3, Math.round(config.label_font_size * 0.3));
+        var paddingHorizontal = Math.max(8, Math.round(config.label_font_size * 0.7));
+
+        var $label = $('<div class="facetag-label">')
+          .text(face.nom)
+          .css({
+            color: config.label_text_color,
+            fontSize: config.label_font_size + 'px',
+            background: labelBgRgba,
+            padding: paddingVertical + 'px ' + paddingHorizontal + 'px',
+            fontWeight: 'normal',
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+            lineHeight: 'normal'
+          });
+        
+        $overlay.append($label);
+        $container.append($overlay);
+        
+        console.log('✓ Overlay créé pour:', face.nom);
+      });
+      
+      facesVisible = true;
+      $('#facetag_show_faces .pwg-button-text').text('Masquer');
+      
+      console.log('=== AFFICHAGE TERMINÉ ===');
     }
-  });
-});
     
-    // Parser les données XMP pour extraire les visages
-    function parseFacesFromXMP(data) {
-      var faces = [];
-      
-      //console.log(('Parsing XMP data...');
-      
-      // Si on a le XMP brut, on le parse
-      if (data._raw_xmp) {
-        //console.log(('Parsing _raw_xmp...');
-        
-        var xmlString = data._raw_xmp;
-        
-        // Parser avec DOMParser
-        var parser = new DOMParser();
-        var xmlDoc = parser.parseFromString(xmlString, "text/xml");
-        
-        // === FORMAT 1 : MPReg (Microsoft Photo Region) ===
-        var mpriRegions = xmlDoc.getElementsByTagName('MPRI:Regions');
-        //console.log(('MPRI:Regions trouvés:', mpriRegions.length);
-        
-        if (mpriRegions.length > 0) {
-          var rdfLis = mpriRegions[0].getElementsByTagName('rdf:li');
-          //console.log(('Nombre de rdf:li dans MPRI:', rdfLis.length);
-          
-          for (var i = 0; i < rdfLis.length; i++) {
-            var li = rdfLis[i];
-            var name = null;
-            var rect = null;
-            
-            // CAS 1 : Attributs directs (format inline)
-            name = li.getAttribute('MPReg:PersonDisplayName');
-            rect = li.getAttribute('MPReg:Rectangle');
-            
-            //console.log(('rdf:li', i, '(attributs) - Name:', name, 'Rectangle:', rect);
-            
-            // CAS 2 : Balises enfants (format multiligne)
-            if (!name || !rect) {
-              var personNodes = li.getElementsByTagName('MPReg:PersonDisplayName');
-              var rectNodes = li.getElementsByTagName('MPReg:Rectangle');
-              
-              if (personNodes.length > 0) {
-                name = personNodes[0].textContent.trim();
-              }
-              if (rectNodes.length > 0) {
-                rect = rectNodes[0].textContent.trim();
-              }
-              
-              //console.log(('rdf:li', i, '(balises) - Name:', name, 'Rectangle:', rect);
-            }
-            
-            if (name && rect) {
-              var coords = rect.split(',').map(function(v) {
-                return parseFloat(v.trim());
-              });
-              
-              if (coords.length === 4) {
-                faces.push({
-                  name: name,
-                  x: coords[0],
-                  y: coords[1],
-                  w: coords[2],
-                  h: coords[3],
-                  format: 'mpreg'
-                });
-                //console.log(('✓ Visage ajouté (MPReg):', name, coords);
-              }
-            }
-          }
-        }
-        
-        // === FORMAT 2 : mwg-rs (Metadata Working Group - Regions) ===
-        var mwgRegionList = xmlDoc.getElementsByTagName('mwg-rs:RegionList');
-        //console.log(('mwg-rs:RegionList trouvés:', mwgRegionList.length);
-        
-        if (mwgRegionList.length > 0) {
-          var descriptions = mwgRegionList[0].getElementsByTagName('rdf:li');
-          //console.log(('Nombre de rdf:li dans mwg-rs:', descriptions.length);
-          
-          for (var i = 0; i < descriptions.length; i++) {
-            var desc = descriptions[i];
-            
-// Lire Name et Type depuis les balises enfants
-var nameEl = desc.getElementsByTagName('mwg-rs:Name')[0];
-var typeEl = desc.getElementsByTagName('mwg-rs:Type')[0];
-
-var name = nameEl ? (nameEl.textContent || nameEl.innerHTML) : null;
-var type = typeEl ? (typeEl.textContent || typeEl.innerHTML) : null;
-
-////console.log((('rdf:li', i, '- Name:', name, 'Type:', type);
-            
-            ////console.log((('Description', i, '- Name:', name, 'Type:', type);
-            
-            if (name && type === 'Face') {
-              // Chercher la balise mwg-rs:Area
-              var areas = desc.getElementsByTagName('mwg-rs:Area');
-              
-              if (areas.length > 0) {
-                var area = areas[0];
-               // Essayer d'abord les attributs (format 1)
-var x = area.getAttribute('stArea:x');
-var y = area.getAttribute('stArea:y');
-var w = area.getAttribute('stArea:w');
-var h = area.getAttribute('stArea:h');
-
-// Si pas d'attributs, chercher les balises enfants (format 2)
-if (!x) {
-  var xEl = area.getElementsByTagName('stArea:x')[0] || area.getElementsByTagName('x')[0];
-  var yEl = area.getElementsByTagName('stArea:y')[0] || area.getElementsByTagName('y')[0];
-  var wEl = area.getElementsByTagName('stArea:w')[0] || area.getElementsByTagName('w')[0];
-  var hEl = area.getElementsByTagName('stArea:h')[0] || area.getElementsByTagName('h')[0];
-  
-  if (xEl) x = xEl.textContent || xEl.innerHTML;
-  if (yEl) y = yEl.textContent || yEl.innerHTML;
-  if (wEl) w = wEl.textContent || wEl.innerHTML;
-  if (hEl) h = hEl.textContent || hEl.innerHTML;
-}
-                
-                ////console.log((('Area:', x, y, w, h);
-                
-                if (x && y && w && h) {
-                  // Vérifier qu'on n'a pas déjà ajouté ce visage (éviter les doublons)
-                  var alreadyExists = false;
-                  for (var j = 0; j < faces.length; j++) {
-                    if (faces[j].name === name) {
-                      alreadyExists = true;
-                      break;
-                    }
-                  }
-                  
-                  if (!alreadyExists) {
-                    faces.push({
-                      name: name,
-                      x: parseFloat(x),
-                      y: parseFloat(y),
-                      w: parseFloat(w),
-                      h: parseFloat(h),
-                      format: 'mwg-rs'
-                    });
-                    //console.log(('✓ Visage ajouté (mwg-rs):', name);
-                  } else {
-                    //console.log(('⊘ Visage ignoré (doublon):', name);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      //console.log(('=== Total visages trouvés:', faces.length, '===');
-      //console.log(('Détails:', faces);
-      return faces;
+    //-----------------------------------------------------------------------------------
+    // Masquer les visages
+    function hideFaces() {
+      $('.facetag-overlay').remove();
+      facesVisible = false;
+      $('#facetag_show_faces .pwg-button-text').text('Visages');
     }
-/// 350
-// Transformer les coordonnées selon l'orientation EXIF
-function transformCoordinates(left, top, width, height, orientation) {
-  var newLeft, newTop, newWidth, newHeight;
-  //console.log(('Orientation = ',orientation);
-  switch(orientation) {
-    case 1: // Normal
-      return {left: left, top: top, width: width, height: height};
-
-    case 2: // Flip horizontal
+    
+    //-----------------------------------------------------------------------------------
+    // Transformer les coordonnées selon l'orientation EXIF
+    function transformCoordinates(left, top, width, height, orientation) {
+      var newLeft, newTop, newWidth, newHeight;
+      
+      switch(orientation) {
+        case 1: // Normal
+          return {left: left, top: top, width: width, height: height};
+          
+        case 2: // Flip horizontal
           newLeft = 100 - left - width;
-          return {left: newLeft, top: top, width: width, height: height};  
-      
-    case 3: // Rotate 180
-      newLeft = 100 - left - width;
-      newTop = 100 - top - height;
-      return {left: newLeft, top: newTop, width: width, height: height};
-
-            case 4: // Flip vertical
+          return {left: newLeft, top: top, width: width, height: height};
+          
+        case 3: // Rotate 180
+          newLeft = 100 - left - width;
           newTop = 100 - top - height;
-          return {left: left, top: newTop, width: width, height: height};  
-
-      case 5: // Rotate 90 CW + Flip horizontal
-          // Transformation : x' = y, y' = x
-          newLeft = top;
-          newTop = left;
-          newWidth = height;
-          newHeight = width;
-          return {left: newLeft, top: newTop, width: newWidth, height: newHeight};      
-      
-    case 6: // Rotate 90 CW
+          return {left: newLeft, top: newTop, width: width, height: height};
+          
+        case 4: // Flip vertical
+          newTop = 100 - top - height;
+          return {left: left, top: newTop, width: width, height: height};
+          
+            case 6: // Rotate 90 CW
     // Pour afficher correctement après rotation
     newLeft = 100 - top - height;
     newTop = left;
     newWidth = height;
     newHeight = width;
     return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
-      
-  case 8: // Rotate 90 CCW (270 CW)
-  // Transformation : x' = 100 - y - height, y' = x
-  newLeft = 100 - top - height;
-  newTop = left;
+          
+       case 8: // Rotate 90 CCW (270 CW)  // V1.9A
+  newLeft = top;
+  newTop = 100 - left - width;
   newWidth = height;
   newHeight = width;
   return {left: newLeft, top: newTop, width: newWidth, height: newHeight};
-      
-    default:
-      return {left: left, top: top, width: width, height: height};
-  }
-}
-
-
-
-    // Afficher les visages sur l'image
-    function displayFaces(faces) {
-      // Chercher d'abord la balise IMG
-      var $img = $('img#theMainImage, img#theImage, .theMainImage img, .theImage img, #theImage img').first();
-      
-      // Si pas trouvé, chercher dans les conteneurs communs
-      if ($img.length === 0) {
-        $img = $('#theImage img, #theMainImage img, .row img').first();
       }
+    }
+    
+    //-------------------------------------------------------------------------------------------------------
+    // Convertir hexa en rgba
+    function hexToRgba(hex, opacity) {
+      var r = parseInt(hex.slice(1, 3), 16);
+      var g = parseInt(hex.slice(3, 5), 16);
+      var b = parseInt(hex.slice(5, 7), 16);
+      return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')';
+    }
+    
+    //--------------------------------------------------------------------------------------------------------
+    // MODE PERSISTENT : afficher automatiquement si activé
+    if (displayMode === 'persistent') {
+      var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
+      console.log('Mode persistant:', isPersistentActive);
       
-      if ($img.length === 0) {
-        //console.error('Image <img> non trouvée !');
-        alert('Image non trouvée');
-        return;
-      }
-      
-      //console.log(('DEBUG - $img:', $img);
-      //console.log(('DEBUG - Tag:', $img[0].tagName);
-      
-var $container = $img.parent();
+      if (isPersistentActive) {
 
-// Si le parent n'est pas encore le conteneur facetag
-if (!$container.hasClass('facetag-container')) {
-  // Wrapper l'image dans un nouveau div
-  $img.wrap('<div class="facetag-container"></div>');
-  $container = $img.parent();
-}
-
-// S'assurer que le conteneur parent est centré
-var $parentContainer = $container.parent();
-if (!$parentContainer.hasClass('facetag-wrapper')) {
-  $container.wrap('<div class="facetag-wrapper"></div>');
-  $parentContainer = $container.parent();
-}
-      
-      $('.facetag-overlay').remove();
-      
-      // Obtenir les dimensions réelles de l'image
-      var imgElement = $img[0];
-      var naturalWidth = imgElement.naturalWidth;
-      var naturalHeight = imgElement.naturalHeight;
-      var displayWidth = $img.width();
-      var displayHeight = $img.height();
-      
-      //console.log(('=== Affichage des visages ===');
-      //console.log(('Image RÉELLE - Largeur:', naturalWidth, 'Hauteur:', naturalHeight);
-      //console.log(('Image AFFICHÉE - Largeur:', displayWidth, 'Hauteur:', displayHeight);
-      
-      $.each(faces, function(index, face) {
-        var left, top, width, height;
+        $('#facetag_show_faces').addClass('facetag-active');
+        var ajaxUrl = $('#facetag_show_faces').data('ajax-url');
         
-        //console.log(('--- Visage:', face.name, '---');
-        //console.log(('Format:', face.format);
-        //console.log(('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
-        
-        if (face.format === 'mpreg') {
-          // Format MPReg: x,y sont le COIN SUPÉRIEUR GAUCHE
-          left = face.x * 100;
-          top = face.y * 100;
-          width = face.w * 100;
-          height = face.h * 100;
-          
-          //console.log(('MPReg - Coin supérieur gauche direct');
-        } else {
-          // Format mwg-rs: x,y sont le CENTRE
-          left = (face.x - face.w / 2) * 100;
-          top = (face.y - face.h / 2) * 100;
-          width = face.w * 100;
-          height = face.h * 100;
-          
-          //console.log(('mwg-rs - Centre converti en coin supérieur gauche');
-        }
-
-        /// 391-416
-        // NOUVEAU : Appliquer la transformation selon l'orientation EXIF
-var orientation = xmpData.orientation || 1;
-var transformed = transformCoordinates(left, top, width, height, orientation);
-left = transformed.left;
-top = transformed.top;
-width = transformed.width;
-height = transformed.height;
-        
-        //console.log(('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
-        
-        // Convertir la couleur hexa en rgba avec opacité
-          function hexToRgba(hex, opacity) {
-            var r = parseInt(hex.slice(1, 3), 16);
-            var g = parseInt(hex.slice(3, 5), 16);
-            var b = parseInt(hex.slice(5, 7), 16);
-            return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')';
+        $.ajax({
+          url: ajaxUrl,
+          type: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            if (data.stat === 'ok' && data.result) {
+              facesData = data.result;
+              if (facesData.faces && facesData.faces.length > 0) {
+                displayFaces(facesData);
+              }else{
+                console.log('pas de visage');  
+              }
+            }
           }
+        });
+      }
+    }
 
-
-       // Créer l'overlay avec les paramètres configurables
-      var $overlay = $('<div class="facetag-overlay">')
-      .css({
-        left: left + '%',
-        top: top + '%',
-        width: width + '%',
-        height: height + '%',
-        border: config.rect_width + 'px solid ' + hexToRgba(config.rect_color, config.rect_opacity),
-        boxShadow: '0 0 10px ' + hexToRgba(config.rect_color, config.rect_opacity * 0.5)
-      });
-
-    var labelBgRgba = hexToRgba(config.label_bg_color, config.label_bg_opacity);
-
-    // Calculer le padding proportionnel à la taille de la police
-var paddingVertical = Math.max(3, Math.round(config.label_font_size * 0.3));
-var paddingHorizontal = Math.max(8, Math.round(config.label_font_size * 0.7));
-
-var $label = $('<div class="facetag-label">')
-  .text(face.name)
-  .css({
-    color: config.label_text_color,
-    fontSize: config.label_font_size + 'px',
-    background: labelBgRgba,
-    padding: paddingVertical + 'px ' + paddingHorizontal + 'px',  // Dynamique
-    fontWeight: 'normal',
-    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-    lineHeight: 'normal'  // Important pour la hauteur
+// ==================== BOUTON : AFFICHER XMP (DEBUG) ====================
+$(document).on('click', '#facetag_show_xmp', function(e) {
+  e.preventDefault();
+  console.log('Clic sur bouton XMP Debug');
+  
+  var ajaxUrl = $(this).data('ajax-url');
+  
+  $.ajax({
+    url: ajaxUrl,
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      console.log('=== XMP DEBUG DATA ===');
+      console.log('Response:', data);
+      
+      if (data.stat === 'ok' && data.result) {
+        console.log('Image ID:', data.result.image_id);
+        console.log('Dimensions:', data.result.wjpg + 'x' + data.result.hjpg);
+        console.log('Orientation:', data.result.orientation);
+        console.log('Faces:', data.result.faces);
+        
+        // Afficher une modale avec les données
+        var jsonStr = JSON.stringify(data.result, null, 2);
+        
+        var $modal = $('<div>')
+          .css({
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '20px',
+            border: '2px solid #333',
+            borderRadius: '8px',
+            maxWidth: '80%',
+            maxHeight: '80%',
+            overflow: 'auto',
+            zIndex: 99999,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+          });
+        
+        var $close = $('<button>')
+          .text('Fermer')
+          .css({
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            padding: '5px 15px',
+            cursor: 'pointer'
+          })
+          .on('click', function() {
+            $modal.remove();
+            $overlay.remove();
+          });
+        
+        var $pre = $('<pre>')
+          .css({
+            background: '#f5f5f5',
+            padding: '15px',
+            borderRadius: '4px',
+            overflow: 'auto',
+            fontSize: '12px',
+            fontFamily: 'monospace'
+          })
+          .text(jsonStr);
+        
+        var $overlay = $('<div>')
+          .css({
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 99998
+          })
+          .on('click', function() {
+            $modal.remove();
+            $overlay.remove();
+          });
+        
+        $modal.append($close);
+        $modal.append('<h3 style="margin-top:0;">XMP Debug Data</h3>');
+        $modal.append($pre);
+        
+        $('body').append($overlay);
+        $('body').append($modal);
+      } else {
+        alert('Erreur: ' + JSON.stringify(data));
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('Erreur AJAX XMP:', error);
+      alert('Erreur AJAX: ' + error);
+    }
   });
-        
-        $overlay.append($label);
-        $container.append($overlay);
-      });
-      
-      facesVisible = true;
-      $('#facetag_show_faces .pwg-button-text').text('Masquer');
-    }
-    
-    // Masquer les visages
-    function hideFaces() {
-      $('.facetag-overlay').remove();
-      facesVisible = false;
-      $('#facetag_show_faces .pwg-button-text').text('Visages');
-      // NE PAS retirer la classe ici, c'est géré dans le click handler
-    }
-    
-    // Fonction pour échapper le HTML
-    function escapeHtml(text) {
-      if (typeof text !== 'string') {
-        text = String(text);
-      }
-      var map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
+});
 
-    // NOUVEAU : Convertir hexa en rgba
-function hexToRgba(hex, opacity) {
-  var r = parseInt(hex.slice(1, 3), 16);
-  var g = parseInt(hex.slice(3, 5), 16);
-  var b = parseInt(hex.slice(5, 7), 16);
-  return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')';
-}
-  
- // MODE PERSISTENT : afficher automatiquement si activé
-if (displayMode === 'persistent') {
-  var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
-  //console.log(('Vérification mode persistant:', isPersistentActive);
-  
-  if (isPersistentActive) {
-    //console.log(('Mode persistant activé - chargement automatique des visages');
-    $('#facetag_show_faces').addClass('facetag-active');
-    
-    // Charger et afficher automatiquement les visages
-    var ajaxUrl = $('#facetag_show_faces').data('ajax-url');
-    
-    $.ajax({
-      url: ajaxUrl,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-        if (data.stat === 'ok' && data.result.xmp) {
-          xmpData = data.result.xmp;                       ///505
-          xmpData.orientation = data.result.orientation || 1; // Stocker l'orientation
-facesData = parseFacesFromXMP(xmpData);
-          
-          //console.log(('Visages trouvés (auto):', facesData.length);
-          
-          if (facesData.length > 0) {
-            displayFaces(facesData);
-          }
-        }
-      },
-      error: function(xhr, status, error) {
-        //console.error('Erreur chargement auto visages:', error);
-      }
-    });
-  }
-}
+
+
 
   }); // fin document.ready
 })(jQuery); // fin IIFE

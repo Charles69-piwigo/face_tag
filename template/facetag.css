@@ -1,24 +1,6 @@
-/*============================================================*/
+/*======================   XMP ======================================*/
 /* Boutons Face Tag XMP */
-#facetag_show_xmp {
-  display: inline-flex;
-  align-items: center;
-  background: none;              /* plus de fond vert sur tout le bouton */
-  color: #ffffff;
-  padding: 5px;
-  border-radius: 1px;
-  text-decoration: none;
- /* border: 1px solid #555555; */
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-#facetag_show_xmp:hover {
-  background-color: #555555;
-  border-color: #777777;
-}
-
-/* Style de l'icône XMP */
+/* Style de l'icône XMP (rouge) */
 #facetag_show_xmp img {
   border-radius: 3px;
   width: 22px;
@@ -29,10 +11,10 @@
   filter: invert(23%) sepia(91%) saturate(6207%) hue-rotate(352deg) brightness(89%) contrast(88%);
 }
 
-/* ==================================================================*/
+/* ========================  FACE  ==========================================*/
 /* Boutons Face Tag FACE */
 
-/* Style de l'icône Faces */
+/* Style de l'icône Faces (blanc/vert) */
 #facetag_show_faces img {
   border-radius: 3px;
   width: 22px;
@@ -40,18 +22,7 @@
   padding: 2px;
   vertical-align: middle;
   margin-right: 5px;
-  /*filter: invert(33%) sepia(56%) saturate(1163%) hue-rotate(188deg) brightness(90%) contrast(91%);*/
-  filter: invert(100%) ;
-
-}
-
-
-/* État ACTIF du bouton */
-#facetag_show_faces.facetag-active {
-  background-color: transparent !important; 
-  color: white !important;
-  /*border-color: #45a049 !important; */
-  /*box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;*/
+  filter: invert(100%);
 }
 
 /* Icône en état actif (vert plus clair) */
@@ -59,6 +30,7 @@
   filter: invert(65%) sepia(53%) saturate(422%) hue-rotate(75deg) brightness(95%) contrast(87%) !important;
 }
 
+/*============================================================*/
 /* Overlays des visages */
 .facetag-overlay {
   position: absolute;
@@ -146,3 +118,4 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   z-index: 1001;
 }
+
