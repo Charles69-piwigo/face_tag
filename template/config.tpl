@@ -33,6 +33,20 @@
         <p class="formHint">{'En mode interrupteur, les visages restent affichés...'|@translate}</p>
       </li>
 
+      <li>
+        <label>
+          {'Couleur de l\'icône active :'|@translate}
+          <input type="color" name="icon_active_color" value={$ICON_ACTIVE_COLOR}>
+        </label>
+      </li>
+
+      <li>
+        <label>
+          {'Couleur de l\'icône inactif & tag existant :'|@translate}
+          <input type="color" name="icon_tagged_color" value={$ICON_TAGGED_COLOR}>
+        </label>
+      </li>
+
     </ul>
   </fieldset>
 

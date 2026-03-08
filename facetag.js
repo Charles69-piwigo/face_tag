@@ -19,12 +19,12 @@
           label_bg_opacity: 0.8
     };
 
-    console.log('Face Tag v2.0 chargé - Mode:', displayMode);
+    console.log('Face Tag chargé - Mode:', displayMode);
     
     // ==================== BOUTON : AFFICHER LES VISAGES ====================
     $(document).on('click', '#facetag_show_faces', function(e) {
       e.preventDefault();
-      console.log('Clic sur bouton Visages');
+      //console.log('Clic sur bouton Visages');
       
       var ajaxUrl = $(this).data('ajax-url');
       
@@ -37,11 +37,15 @@
           localStorage.setItem('facetag_persistent_mode', 'false');
           hideFaces();
           $(this).removeClass('facetag-active');
+          // Remettre l'indicateur bleu si des faces existent en cache
+          if (facesData && facesData.faces && facesData.faces.length > 0) {
+            $(this).addClass('facetag-has-faces');
+          }
           return;
         } else {
           // Activer le mode persistant
           localStorage.setItem('facetag_persistent_mode', 'true');
-          $(this).addClass('facetag-active');
+          $(this).removeClass('facetag-has-faces').addClass('facetag-active');
         }
 
       } else {
@@ -58,7 +62,7 @@
 
       // Si on a déjà les données, on affiche directement
       if (facesData) {
-        console.log('Utilisation des données en cache');
+        //console.log('Utilisation des données en cache');
         displayFaces(facesData);
         return;
       }
@@ -71,21 +75,21 @@
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-          console.log('Réponse AJAX:', data);
+          //console.log('Réponse AJAX:', data);
           
           if (data.stat === 'ok' && data.result) {
             facesData = data.result;
             
-            console.log('=== DONNÉES REÇUES ===');
-            console.log('Dimensions:', facesData.wjpg, 'x', facesData.hjpg);
-            console.log('Orientation:', facesData.orientation);
-            console.log('Visages:', facesData.faces.length);
-            console.log('Détails:', facesData.faces);
+            //console.log('=== DONNÉES REÇUES ===');
+            //console.log('Dimensions:', facesData.wjpg, 'x', facesData.hjpg);
+            //console.log('Orientation:', facesData.orientation);
+            //console.log('Visages:', facesData.faces.length);
+            //console.log('Détails:', facesData.faces);
 
             if (facesData.faces && facesData.faces.length > 0) {
               displayFaces(facesData);
             } else {
-              console.log('Aucun visage trouvé');
+              //console.log('Aucun visage trouvé');
               alert('Aucun visage trouvé dans cette photo');
               $button.removeClass('facetag-active');
             }
@@ -106,7 +110,7 @@
     //------------------------------------------------------------------------------------------------------------------
     // Afficher les visages sur l'image
     function displayFaces(data) {
-      console.log('=== AFFICHAGE DES VISAGES ===');
+      //console.log('=== AFFICHAGE DES VISAGES ===');
       
       // Chercher l'image
       var $img = $('img#theMainImage, img#theImage, .theMainImage img, .theImage img, #theImage img').first();
@@ -121,7 +125,7 @@
         return;
       }
       
-      console.log('Image trouvée:', $img[0].src);
+      //console.log('Image trouvée:', $img[0].src);
       
       // Wrapper l'image si nécessaire
       var $container = $img.parent();
@@ -141,9 +145,9 @@
       
       // Parcourir chaque visage
       $.each(data.faces, function(index, face) {
-        console.log('--- Visage', index + 1, ':', face.nom, '---');
-        console.log('Méthode:', face.methode);
-        console.log('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
+        //console.log('--- Visage', index + 1, ':', face.nom, '---');
+        //console.log('Méthode:', face.methode);
+        //console.log('Coordonnées brutes - x:', face.x, 'y:', face.y, 'w:', face.w, 'h:', face.h);
         
         var left, top, width, height;
         
@@ -153,14 +157,14 @@
           top = face.y * 100;
           width = face.w * 100;
           height = face.h * 100;
-          console.log('MPReg - Coin supérieur gauche direct');
+          //console.log('MPReg - Coin supérieur gauche direct');
         } else {
           // MWG-RS (et Lightroom): x,y sont le CENTRE
           left = (face.x - face.w / 2) * 100;
           top = (face.y - face.h / 2) * 100;
           width = face.w * 100;
           height = face.h * 100;
-          console.log('MWG-RS/Lightroom - Centre converti en coin supérieur gauche');
+          //console.log('MWG-RS/Lightroom - Centre converti en coin supérieur gauche');
         }
         
         // Appliquer la transformation selon l'orientation EXIF
@@ -171,8 +175,7 @@
         width = transformed.width;
         height = transformed.height;
         
-        console.log('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 
-                    'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
+        ////console.log('Position finale - left:', left.toFixed(2) + '%', 'top:', top.toFixed(2) + '%', 'width:', width.toFixed(2) + '%', 'height:', height.toFixed(2) + '%');
         
         // Créer l'overlay
         var $overlay = $('<div class="facetag-overlay">')
@@ -204,13 +207,13 @@
         $overlay.append($label);
         $container.append($overlay);
         
-        console.log('✓ Overlay créé pour:', face.nom);
+        //console.log('✓ Overlay créé pour:', face.nom);
       });
       
       facesVisible = true;
       $('#facetag_show_faces .pwg-button-text').text('Masquer');
       
-      console.log('=== AFFICHAGE TERMINÉ ===');
+      //console.log('=== AFFICHAGE TERMINÉ ===');
     }
     
     //-----------------------------------------------------------------------------------
@@ -273,13 +276,13 @@
     // MODE PERSISTENT : afficher automatiquement si activé
     if (displayMode === 'persistent') {
       var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
-      console.log('Mode persistant:', isPersistentActive);
+      //console.log('Mode persistant:', isPersistentActive);
       
       if (isPersistentActive) {
 
         $('#facetag_show_faces').addClass('facetag-active');
         var ajaxUrl = $('#facetag_show_faces').data('ajax-url');
-        
+
         $.ajax({
           url: ajaxUrl,
           type: 'GET',
@@ -290,18 +293,36 @@
               if (facesData.faces && facesData.faces.length > 0) {
                 displayFaces(facesData);
               }else{
-                console.log('pas de visage');  
+                //console.log('pas de visage');
               }
             }
           }
         });
+      } else {
+        // Mode désactivé : vérifier silencieusement s'il y a des faces pour afficher l'indicateur bleu
+        var ajaxUrl = $('#facetag_show_faces').data('ajax-url');
+        if (ajaxUrl) {
+          $.ajax({
+            url: ajaxUrl,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+              if (data.stat === 'ok' && data.result) {
+                facesData = data.result;
+                if (facesData.faces && facesData.faces.length > 0) {
+                  $('#facetag_show_faces').addClass('facetag-has-faces');
+                }
+              }
+            }
+          });
+        }
       }
     }
 
 // ==================== BOUTON : AFFICHER XMP (DEBUG) ====================
 $(document).on('click', '#facetag_show_xmp', function(e) {
   e.preventDefault();
-  console.log('Clic sur bouton XMP Debug');
+  //console.log('Clic sur bouton XMP Debug');
   
   var ajaxUrl = $(this).data('ajax-url');
   
@@ -310,14 +331,14 @@ $(document).on('click', '#facetag_show_xmp', function(e) {
     type: 'GET',
     dataType: 'json',
     success: function(data) {
-      console.log('=== XMP DEBUG DATA ===');
-      console.log('Response:', data);
+      //console.log('=== XMP DEBUG DATA ===');
+      //console.log('Response:', data);
       
       if (data.stat === 'ok' && data.result) {
-        console.log('Image ID:', data.result.image_id);
-        console.log('Dimensions:', data.result.wjpg + 'x' + data.result.hjpg);
-        console.log('Orientation:', data.result.orientation);
-        console.log('Faces:', data.result.faces);
+        //console.log('Image ID:', data.result.image_id);
+        //console.log('Dimensions:', data.result.wjpg + 'x' + data.result.hjpg);
+        //console.log('Orientation:', data.result.orientation);
+        //console.log('Faces:', data.result.faces);
         
         // Afficher une modale avec les données
         var jsonStr = JSON.stringify(data.result, null, 2);

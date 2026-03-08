@@ -1,5 +1,4 @@
 /*======================   XMP ======================================*/
-/* Boutons Face Tag XMP */
 /* Style de l'icône XMP (rouge) */
 #facetag_show_xmp img {
   border-radius: 3px;
@@ -12,23 +11,7 @@
 }
 
 /* ========================  FACE  ==========================================*/
-/* Boutons Face Tag FACE */
-
-/* Style de l'icône Faces (blanc/vert) */
-#facetag_show_faces img {
-  border-radius: 3px;
-  width: 22px;
-  height: 22px;
-  padding: 2px;
-  vertical-align: middle;
-  margin-right: 5px;
-  filter: invert(100%);
-}
-
-/* Icône en état actif (vert plus clair) */
-#facetag_show_faces.facetag-active img {
-  filter: invert(65%) sepia(53%) saturate(422%) hue-rotate(75deg) brightness(95%) contrast(87%) !important;
-}
+/* couleurs de l'icône SVG inline gérées via color: dans le <style> du template */
 
 /*============================================================*/
 /* Overlays des visages */
@@ -59,15 +42,6 @@
   margin-top: 2px;
  }
 */
-
- #facetag_show_faces.facetag-active {
-  background-color: #4CAF50 !important;
-  color: white !important;
-  border-color: #45a049 !important;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;
-  
-}
-
 
 /* CONTAINER */
 .facetag-wrapper {
@@ -111,11 +85,10 @@
   padding: 0.3em 0.7em; /* Padding relatif à la taille de police */
   border-radius: 3px;
   font-size: 13px; /* SANS !important */
-  font-weight: normal;  
+  font-weight: normal;
   white-space: nowrap;
   pointer-events: none;
   margin-top: 3px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   z-index: 1001;
 }
-

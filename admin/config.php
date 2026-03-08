@@ -54,6 +54,8 @@ if (isset($_POST['submit']))   // quand on clique sur Enregistrer la configurati
     'label_font_size' => intval($_POST['label_font_size']),
     'label_bg_color' => $_POST['label_bg_color'],
     'label_bg_opacity' => floatval($_POST['label_bg_opacity']),
+    'icon_active_color' => $_POST['icon_active_color'],
+    'icon_tagged_color' => $_POST['icon_tagged_color'],
 
   );
   save_config($config) ;
@@ -81,6 +83,8 @@ $template->assign(array(
   'LABEL_FONT_SIZE' => $config['label_font_size'],
   'LABEL_BG_COLOR' => $config['label_bg_color'],
   'LABEL_BG_OPACITY' => $config['label_bg_opacity'],
+  'ICON_ACTIVE_COLOR' => $config['icon_active_color'],
+  'ICON_TAGGED_COLOR' => $config['icon_tagged_color'],
 ));
 
 // Charger le template

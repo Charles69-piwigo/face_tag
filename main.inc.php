@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 1.9C
+Version: 2.0b
 Description: afficher les visages tagués avec face_tag_editor et autres
 Plugin URI: https://piwigo.org/ext/extension_view.php?eid=1051
 Author: Charles69
@@ -11,25 +11,31 @@ Has Settings: webmaster
 
 // ============  VERSIONS =========================================================
  // historique des versions
-/*
-version 1.9C - en cours 16/12/2025
-    corrigé erreur sur orientation 8 - 270CW
-    modifié alignement des icones sur modus + css
+ /*
+version 2.0b - 08/03/2026
+    modification mode global avec indication visuelle quand il y un tag visage
+    et choix des couleurs des icones
     
+version 2.0 - 18/12/2025
+    numérotation de version = face_tag_editor
+    corrigé erreur sur orientation 8 - 270CW
+    neutralisation des console.log
+    modifié alignement des icones sur modus + css
+
 version 1.9 - 10/12/2025 diffusée
     REFONTE COMPLÈTE - Approche REGEX au lieu de parsing XML DOM
     Extraction directe du segment XMP + regex simples
-    
+
 version 1.9 - 09/12/2025 (non diffusée)
     tentative support format Lightroom (bugs)
-    
+
 version 1.8A - en cours
     corrigé page configuration
 
 version 1.8 - 04/12/2025 - diffusé
     si PHP Imagick n'est pas actif , External Magick est utilisé , sinon message d'avertissement
     modification des icones en svg
-    
+
 version 1.7 - 30/11/2025
     corrigé : lecture des visages créés par xnview
     orientation 8 corrigé , ajouté orientation 2,3,4
@@ -37,20 +43,20 @@ version 1.7 - 30/11/2025
 version 1.6 - 25/11/2025
     ajouté support orientation EXIF pour photos en mode portrait
     corrigé orientation type6 = 90 CW
- 
+
 version 1.5 - 20/11/2025
     corrigé conflit avec l'absence de super_zoom
- 
+
 version 1.4 - 16/11/2025
     corrigé jQuery non chargé dans certaines configurations
     testé avec les thèmes Bootstrap_Darkroom, Modus et Elegant
-    
+
 version 1.3 - 16/11/2025
     paramètres ajout bouton valeurs par défaut
     correction taduction uk
     changement couleur sur bouton toggle
     console.log en remarques
-    
+
 version 1.2 - 15/11/2025
     erreur dans maintain.inc.php
 
@@ -101,7 +107,7 @@ add_event_handler('loc_begin_page_header', 'facetag_load_jquery');
 function facetag_load_jquery()
 {
   global $template;
-  
+
   // Charger jQuery seulement s'il n'est pas déjà chargé
   $template->append('head_elements', '
   <script type="text/javascript">
@@ -118,7 +124,7 @@ add_event_handler('loc_end_page_tail', 'facetag_add_extension');
 function facetag_add_extension()
 {
   global $template;
-  
+
   $template->append('footer_elements', '
   <link rel="stylesheet" href="plugins/face_tag/template/facetag.css">
   <script src="plugins/face_tag/facetag.js"></script>
@@ -131,31 +137,31 @@ add_event_handler('loc_end_picture', 'facetag_picture_toolbar');
 function facetag_picture_toolbar()
 {
   global $template, $user, $picture;
-  
+
   // Charger les valeurs par défaut
-  include(dirname(__FILE__) . '/install/config_defaut.php'); 
-  
+  include(dirname(__FILE__) . '/install/config_defaut.php');
+
   // Charger la configuration
   $config_raw = conf_get_param('face_tag_config', false);
   $config = ($config_raw !== false) ? @unserialize($config_raw) : false;
-  
+
   if (!is_array($config)) {
     $config = $config_defaut;
   } else {
     $config = array_merge($config_defaut, $config);
   }
-  
+
   // Ne rien afficher si les deux boutons sont désactivés
   if (!$config['show_xmp_button'] && !$config['show_faces_button']) {
     return;
   }
-  
+
   $template->set_template_dir(FACETAG_PATH.'template/');
-  
+
   // Construire l'URL du bouton (AJAX)
   $ajax_url = get_root_url() . 'ws.php?format=json&method=facetag.getXMP&image_id=' . $picture['current']['id'];
   $icon = get_root_url() . 'plugins/' . FACETAG_ID . '/images/face.svg';
-  
+
   // Assigner les variables au template
   $template->assign(array(
     'FACETAG_AJAX_URL' => $ajax_url,
@@ -171,15 +177,17 @@ function facetag_picture_toolbar()
     'FACETAG_LABEL_FONT_SIZE' => isset($config['label_font_size']) ? $config['label_font_size'] : $config_defaut['label_font_size'],
     'FACETAG_LABEL_BG_COLOR' => isset($config['label_bg_color']) ? $config['label_bg_color'] : $config_defaut['label_bg_color'],
     'FACETAG_LABEL_BG_OPACITY' => isset($config['label_bg_opacity']) ? $config['label_bg_opacity'] : $config_defaut['label_bg_opacity'],
+    'FACETAG_ICON_ACTIVE_COLOR' => isset($config['icon_active_color']) ? $config['icon_active_color'] : $config_defaut['icon_active_color'],
+    'FACETAG_ICON_TAGGED_COLOR' => isset($config['icon_tagged_color']) ? $config['icon_tagged_color'] : $config_defaut['icon_tagged_color'],
   ));
-  
+
   // Choix du template selon le thème
   if ($user['theme'] == 'bootstrapdefault' || $user['theme'] == 'bootstrap_darkroom') {
     $tpl_file = 'picture_facetag_Bootstrap.tpl';
   } else {
     $tpl_file = 'picture_facetag.tpl';
   }
-  
+
   // Assigner le template au bloc d'actions
   $template->set_filename('facetag_button', $tpl_file);
   $template->concat('PLUGIN_PICTURE_ACTIONS', $template->parse('facetag_button', true));
@@ -191,7 +199,7 @@ add_event_handler('ws_add_methods', 'facetag_ws_add_methods');
 function facetag_ws_add_methods($arr)
 {
   $service = &$arr[0];
-  
+
   $service->addMethod(
     'facetag.getXMP',
     'facetag_ws_get_xmp',
@@ -210,31 +218,31 @@ function facetag_ws_get_xmp($params, &$service)
   {
     return new PwgError(WS_ERR_INVALID_PARAM, 'Missing image_id');
   }
-  
+
   // Récupérer le chemin de l'image
   $query = '
 SELECT path
 FROM ' . IMAGES_TABLE . '
 WHERE id = ' . intval($params['image_id']);
-  
+
   $result = pwg_query($query);
   $row = pwg_db_fetch_assoc($result);
-  
+
   if (!$row)
   {
     return new PwgError(404, 'Image not found');
   }
-  
+
   $image_path = PHPWG_ROOT_PATH . $row['path'];
-  
+
   if (!file_exists($image_path))
   {
     return new PwgError(404, 'Image file not found');
   }
-  
+
   // === EXTRACTION v2.0 : Utiliser la bibliothèque ===
   $data = facetag_lib_extract_faces_data($image_path);
-  
+
   return array(
     'image_id' => $params['image_id'],
     'wjpg' => $data['wjpg'],
