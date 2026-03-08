@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 2.0b
+Version: 2.1
 Description: afficher les visages tagués avec face_tag_editor et autres
 Plugin URI: https://piwigo.org/ext/extension_view.php?eid=1051
 Author: Charles69
@@ -12,7 +12,7 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
-version 2.0b - 08/03/2026
+version 2.1 - 08/03/2026
     modification mode global avec indication visuelle quand il y un tag visage
     et choix des couleurs des icones
     
