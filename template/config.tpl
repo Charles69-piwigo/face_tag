@@ -124,7 +124,7 @@
 
 </ul>
 </fieldset>
-  
+
   <p style="text-align: left; margin-left: 40px;">
     <input type="submit" name="submit" value="{'Enregistrer'|@translate}">
   </p>

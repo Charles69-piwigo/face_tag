@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: face_tag
-Version: 2.1
+Version: auto
 Description: afficher les visages tagués avec face_tag_editor et autres
 Plugin URI: https://piwigo.org/ext/extension_view.php?eid=1051
 Author: Charles69
@@ -12,7 +12,23 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
-version 2.1 - 08/03/2026
+ version 2.3 - 16/08/2026
+      aide mise à jour
+      version auto pour PEM
+      langues FR UK mises à jour
+
+ version 2.2b - 15/08/2026
+      automatisaton de la correction des tags
+ 
+ version 2.2a - 15/08/2026
+     controle des tags
+
+ version 2.2 - 14/08/2026
+    ajouté la fonctionnalité de ne pas afficher les noms dans le nuage de tag
+    -> ajout d'une table supplémentaire 'facetag_person_tags'
+    Prise en compte de PWG_Stuffs
+        
+ version 2.1 - 08/03/2026
     modification mode global avec indication visuelle quand il y un tag visage
     et choix des couleurs des icones
     
@@ -86,6 +102,8 @@ global $prefixeTable;
 define('FACETAG_ID', basename(dirname(__FILE__)));
 define('FACETAG_PATH', PHPWG_PLUGINS_PATH . FACETAG_ID . '/');
 define('FACETAG_TABLE', $prefixeTable . 'facetag');
+define('FACETAG_PERSON_TAGS_TABLE', $prefixeTable . 'facetag_person_tags');
+define('FACETAG_UNRESOLVED_FACES_TABLE', $prefixeTable . 'facetag_unresolved_faces');
 define('FACETAG_ADMIN', get_root_url() . 'admin.php?page=plugin-' . FACETAG_ID);
 define('FACETAG_PUBLIC', get_absolute_root_url() . make_index_url(array('section' => 'face_tag')) . '/');
 define('FACETAG_DIR', PHPWG_ROOT_PATH . PWG_LOCAL_DIR . 'face_tag/');
@@ -191,6 +209,116 @@ function facetag_picture_toolbar()
   // Assigner le template au bloc d'actions
   $template->set_filename('facetag_button', $tpl_file);
   $template->concat('PLUGIN_PICTURE_ACTIONS', $template->parse('facetag_button', true));
+}
+
+// ==================== EXCLUSION DES TAGS VISAGE (helper partagé) ====================
+
+/**
+ * Retourne la liste des tag_id à exclure du nuage de tags public, ou un
+ * tableau vide si l'option est désactivée. Utilisé à la fois pour le
+ * filtrage direct de tags.php et pour exposer la liste aux templates
+ * (ex: widgets tiers comme PWG_Stuffs qui n'appellent pas loc_end_tags).
+ *
+ * @return int[]
+ */
+function facetag_get_excluded_tag_ids()
+{
+  $config_raw = conf_get_param('face_tag_config', false);
+  $config = ($config_raw !== false) ? @unserialize($config_raw) : false;
+
+  if (!is_array($config) || empty($config['hide_face_tags_cloud']))
+  {
+    return array();
+  }
+
+  $result = pwg_query('SELECT tag_id FROM '.FACETAG_PERSON_TAGS_TABLE.' WHERE is_face_tag = 1;');
+  $excluded_ids = array();
+  while ($row = pwg_db_fetch_assoc($result))
+  {
+    $excluded_ids[] = intval($row['tag_id']);
+  }
+
+  return $excluded_ids;
+}
+
+// Rendre la liste disponible à tous les templates (ex: stuffs_tags.tpl surchargé
+// dans le thème, pour le widget de tags de PWG_Stuffs qui contourne tags.php)
+add_event_handler('init', 'facetag_assign_excluded_tag_ids_to_template');
+
+function facetag_assign_excluded_tag_ids_to_template()
+{
+  global $template;
+  $template->assign('FACETAG_EXCLUDED_TAG_IDS', facetag_get_excluded_tag_ids());
+}
+
+// ==================== FILTRAGE DU NUAGE DE TAGS PUBLIC (tags.php) ====================
+add_event_handler('loc_end_tags', 'facetag_filter_public_tag_cloud');
+
+function facetag_filter_public_tag_cloud()
+{
+  global $template;
+
+  $excluded_ids = facetag_get_excluded_tag_ids();
+
+  if (empty($excluded_ids))
+  {
+    return;
+  }
+
+  // Mode "nuage" : liste plate de tags
+  $tags = $template->get_template_vars('tags');
+  if (is_array($tags) && count($tags) > 0)
+  {
+    $tags = array_values(array_filter($tags, function($tag) use ($excluded_ids) {
+      return !in_array($tag['id'], $excluded_ids);
+    }));
+    $template->assign('tags', $tags);
+  }
+
+  // Mode "lettres" : groupes de lettres contenant chacun une liste de tags
+  $letters = $template->get_template_vars('letters');
+  if (is_array($letters) && count($letters) > 0)
+  {
+    $filtered_letters = array();
+    foreach ($letters as $letter)
+    {
+      if (isset($letter['tags']) && is_array($letter['tags']))
+      {
+        $letter['tags'] = array_values(array_filter($letter['tags'], function($tag) use ($excluded_ids) {
+          return !in_array($tag['id'], $excluded_ids);
+        }));
+      }
+      if (!empty($letter['tags']))
+      {
+        $filtered_letters[] = $letter;
+      }
+    }
+    $template->assign('letters', $filtered_letters);
+  }
+}
+
+// ==================== MASQUAGE DU COMPTEUR DE TAGS DU MENU "DÉCOUVRIR" ====================
+add_event_handler('blockmanager_apply', 'facetag_hide_tags_menu_counter');
+
+function facetag_hide_tags_menu_counter($menu_ref_arr)
+{
+  $menu = $menu_ref_arr[0];
+
+  if ($menu->get_id() != 'menubar')
+  {
+    return;
+  }
+
+  if (empty(facetag_get_excluded_tag_ids()))
+  {
+    return;
+  }
+
+  $block = $menu->get_block('mbMenu');
+  if ($block !== null && isset($block->data['tags']['COUNTER']))
+  {
+    unset($block->data['tags']['COUNTER']);
+  }
 }
 
 // ==================== WEB SERVICE ====================

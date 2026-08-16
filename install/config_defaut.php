@@ -14,7 +14,7 @@ $config_defaut = array(
   'label_bg_opacity' => 0.8,
   'icon_active_color' => '#4CAF50',
   'icon_tagged_color' => '#2196F3',
-
+  'hide_face_tags_cloud' => false,
 
 );
 ?>

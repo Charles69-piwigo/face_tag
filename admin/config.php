@@ -4,69 +4,42 @@ defined('FACETAG_PATH') or die('Hacking attempt!');
 // Afficher le tabsheet
 facetag_admin_tabsheet('config');
 
- // Charger les valeurs par défaut
-include(FACETAG_PATH.'install/config_defaut.php');
-  
+// Charger la configuration existante
+$config = facetag_load_config();
 
-
-// Charger les paramètres existants
-
-$config_string = conf_get_param('face_tag_config', false);
-
-if ($config_string === false) {
-  // Première utilisation : créer la config par défaut
-  $config = $config_defaut;
-  conf_update_param('face_tag_config', serialize($config));
-} else {
-  // Charger la config existante
-  $config = @unserialize($config_string);
-  
-  // Si unserialize échoue ou retourne null, utiliser les valeurs par défaut
-  if (!is_array($config)) {
-    $config = $config_defaut;
-  } else {
-    // S'assurer que toutes les clés existent
-    $config = array_merge($config_defaut, $config);
-  }
-}
-
-
-// Fonction de sauvegarde 
-function save_config($params) {
-    global $page;
-    conf_update_param('face_tag_config', serialize($params));
-    $sauve = l10n('Configuration enregistrée avec succès');
-    array_push($page['infos'], $sauve);
-}
-
-
-///    Sauvegarde de la configurtion SUBMIT =========================
+///    Sauvegarde de la configuration SUBMIT =========================
 if (isset($_POST['submit']))   // quand on clique sur Enregistrer la configuration
 {
-  $config = array(
-    'show_xmp_button' => isset($_POST['show_xmp_button']),
-    'show_faces_button' => isset($_POST['show_faces_button']),
-    'faces_display_mode' => $_POST['faces_display_mode'],
-    'rect_color' => $_POST['rect_color'],
-    'rect_width' => intval($_POST['rect_width']),
-    'rect_opacity' => floatval($_POST['rect_opacity']),
-    'label_text_color' => $_POST['label_text_color'],
-    'label_font_size' => intval($_POST['label_font_size']),
-    'label_bg_color' => $_POST['label_bg_color'],
-    'label_bg_opacity' => floatval($_POST['label_bg_opacity']),
-    'icon_active_color' => $_POST['icon_active_color'],
-    'icon_tagged_color' => $_POST['icon_tagged_color'],
-
-  );
-  save_config($config) ;
+  $config['show_xmp_button'] = isset($_POST['show_xmp_button']);
+  $config['show_faces_button'] = isset($_POST['show_faces_button']);
+  $config['faces_display_mode'] = $_POST['faces_display_mode'];
+  $config['rect_color'] = $_POST['rect_color'];
+  $config['rect_width'] = intval($_POST['rect_width']);
+  $config['rect_opacity'] = floatval($_POST['rect_opacity']);
+  $config['label_text_color'] = $_POST['label_text_color'];
+  $config['label_font_size'] = intval($_POST['label_font_size']);
+  $config['label_bg_color'] = $_POST['label_bg_color'];
+  $config['label_bg_opacity'] = floatval($_POST['label_bg_opacity']);
+  $config['icon_active_color'] = $_POST['icon_active_color'];
+  $config['icon_tagged_color'] = $_POST['icon_tagged_color'];
+  facetag_save_config($config);
 }
 
 //  Sauvegarde des valeurs par defaut INIT   ====================================
 
 if (isset($_POST['reinit']))   // quand on clique sur Valeurs par défaut
 {
-$config =$config_defaut ;  
-save_config($config)  ;
+  include(FACETAG_PATH.'install/config_defaut.php');
+
+  // Ne réinitialise que les réglages de cet onglet (pas ceux de "Affichage des tags")
+  foreach ($config_defaut as $key => $value)
+  {
+    if ($key !== 'hide_face_tags_cloud')
+    {
+      $config[$key] = $value;
+    }
+  }
+  facetag_save_config($config);
 }
 
 //======================================================================
@@ -88,8 +61,7 @@ $template->assign(array(
 ));
 
 // Charger le template
-//$template->set_filename('face_tag_config', dirname(__FILE__).'/../template/config.tpl');
-$template->set_filename('face_tag_config',FACETAG_PATH . 'template/config.tpl');
+$template->set_filename('face_tag_config', FACETAG_PATH . 'template/config.tpl');
 $template->assign_var_from_handle('ADMIN_CONTENT', 'face_tag_config');
 
 //---------------------------------------------------------------------
