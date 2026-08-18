@@ -115,6 +115,11 @@ $lang['photos traitées'] = 'photos processed';
 $lang['Resynchronisation terminée'] = 'Resynchronization complete';
 $lang['discordance(s) résolue(s)'] = 'discrepancy(ies) resolved';
 
+$lang['Vérification automatique à l\'affichage (avancé)'] = 'Automatic check on display (advanced)';
+$lang['En complément de la synchronisation manuelle ci-dessus, il est possible d\'activer une vérification automatique : à chaque affichage d\'une photo, si un visage détecté dans le XMP n\'a pas de tag Piwigo correspondant, le tag est créé et attaché immédiatement. Utile notamment pour les photos ajoutées par upload web, qui ne sont pas toujours synchronisées correctement.'] = 'In addition to the manual synchronization above, an automatic check can be enabled: every time a photo is displayed, if a face detected in the XMP has no matching Piwigo tag, the tag is created and attached immediately. Useful in particular for photos added by web upload, which are not always synchronized correctly.';
+$lang['Ce n\'est pas un réglage de cet écran : ça s\'active en ajoutant cette ligne dans local/config/config.inc.php de Piwigo :'] = 'This is not a setting on this screen: it is enabled by adding this line to Piwigo\'s local/config/config.inc.php:';
+$lang['Désactivé par défaut, car cette vérification ajoute une lecture du fichier à chaque affichage de photo — à réserver aux installations qui rencontrent réellement des photos mal synchronisées après upload.'] = 'Disabled by default, because this check adds a file read on every photo display — reserve it for installations that actually experience photos being incorrectly synchronized after upload.';
+
 $lang['Réinitialisation des visages'] = 'Reset faces';
 $lang['Effacer toute la table des tags visage ? Cette action est irréversible.'] = 'Clear the entire face tags table? This action is irreversible.';
 $lang['Efface entièrement la table de correspondance des tags visage (auto ET manuel). Le nuage de tags public affichera de nouveau tous les tags jusqu\'à la prochaine synchronisation. Les corrections manuelles éventuellement faites sont définitivement perdues.'] = 'Completely clears the face tags matching table (auto AND manual). The public tag cloud will show all tags again until the next synchronization. Any manual corrections made are permanently lost.';

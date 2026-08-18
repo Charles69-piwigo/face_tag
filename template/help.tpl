@@ -160,6 +160,16 @@
     </div>
 
     <div class="help-section">
+      <h4>{'Vérification automatique à l\'affichage (avancé)'|@translate}</h4>
+      <p>{'En complément de la synchronisation manuelle ci-dessus, il est possible d\'activer une vérification automatique : à chaque affichage d\'une photo, si un visage détecté dans le XMP n\'a pas de tag Piwigo correspondant, le tag est créé et attaché immédiatement. Utile notamment pour les photos ajoutées par upload web, qui ne sont pas toujours synchronisées correctement.'|@translate}</p>
+      <div class="help-note">
+        {'Ce n\'est pas un réglage de cet écran : ça s\'active en ajoutant cette ligne dans local/config/config.inc.php de Piwigo :'|@translate}
+        <br><code>$conf['face_tag_check'] = true;</code>
+        <p>{'Désactivé par défaut, car cette vérification ajoute une lecture du fichier à chaque affichage de photo — à réserver aux installations qui rencontrent réellement des photos mal synchronisées après upload.'|@translate}</p>
+      </div>
+    </div>
+
+    <div class="help-section">
       <h4>{'Réinitialisation des visages'|@translate}</h4>
       <p>{'Efface entièrement la table des tags visage. Utile uniquement en cas de problème : la synchronisation habituelle suffit dans l\'immense majorité des cas.'|@translate}</p>
     </div>

@@ -12,6 +12,10 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+ version 2.3a - 18/08/2026 NON DIFFUSEE
+      ajout auto des tags visage aux tags pwg s'ils n'y sont pas
+      activé par $conf['face_tag_check'] = true;
+
  version 2.3 - 16/08/2026
       aide mise à jour
       version auto pour PEM
@@ -209,6 +213,147 @@ function facetag_picture_toolbar()
   // Assigner le template au bloc d'actions
   $template->set_filename('facetag_button', $tpl_file);
   $template->concat('PLUGIN_PICTURE_ACTIONS', $template->parse('facetag_button', true));
+}
+
+// ==================== SYNCHRONISATION AUTOMATIQUE DES TAGS VISAGE ====================
+// Corrige silencieusement, à l'affichage d'une photo, les tags visage absents
+// de la base Piwigo (cas fréquent : synchro non déclenchée après un upload
+// utilisateur). Hooké sur loc_begin_picture (avant get_common_tags() dans
+// picture.php) pour que le tag nouvellement créé apparaisse dès ce chargement.
+//
+// Désactivé par défaut : ajoute une lecture du fichier (XMP) à chaque
+// affichage de photo, donc réservé aux installs qui rencontrent réellement
+// des discordances après upload. Activation via local/config/config.inc.php :
+//   $conf['face_tag_check'] = true;
+global $conf;
+if (!empty($conf['face_tag_check']))
+{
+  add_event_handler('loc_begin_picture', 'facetag_auto_sync_current_image_tags');
+}
+
+function facetag_auto_sync_current_image_tags()
+{
+  global $page;
+
+  if (empty($page['image_id']))
+  {
+    return;
+  }
+
+  $image_id = intval($page['image_id']);
+
+  $result = pwg_query('
+SELECT path
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$image_id.'
+;');
+  $row = pwg_db_fetch_assoc($result);
+  if (!$row)
+  {
+    return;
+  }
+
+  $image_path = PHPWG_ROOT_PATH . $row['path'];
+  if (!is_file($image_path))
+  {
+    return;
+  }
+
+  $data = facetag_lib_extract_faces_data($image_path);
+  if (empty($data['faces']))
+  {
+    return;
+  }
+
+  // Noms détectés dans le XMP, dédupliqués (minuscule => nom original)
+  $face_names = array();
+  foreach ($data['faces'] as $face)
+  {
+    if (!empty($face['nom']))
+    {
+      $nom = trim($face['nom']);
+      $face_names[mb_strtolower($nom)] = $nom;
+    }
+  }
+  if (empty($face_names))
+  {
+    return;
+  }
+
+  // Tags déjà attachés à cette photo
+  $attached_tag_ids = query2array('
+SELECT tag_id FROM '.IMAGE_TAG_TABLE.'
+  WHERE image_id = '.$image_id.'
+;', null, 'tag_id');
+
+  $attached_names = array();
+  if (!empty($attached_tag_ids))
+  {
+    $result = pwg_query('
+SELECT name FROM '.TAGS_TABLE.'
+  WHERE id IN ('.implode(',', $attached_tag_ids).')
+;');
+    while ($row = pwg_db_fetch_assoc($result))
+    {
+      $attached_names[mb_strtolower(trim($row['name']))] = true;
+    }
+  }
+
+  $missing_names = array();
+  foreach ($face_names as $lower => $original)
+  {
+    if (!isset($attached_names[$lower]))
+    {
+      $missing_names[] = $original;
+    }
+  }
+  if (empty($missing_names))
+  {
+    return;
+  }
+
+  // Même logique de création que facetag_retry_and_record_unresolved()
+  // (admin/functions.inc.php), appliquée ici photo par photo à l'affichage
+  // plutôt qu'en synchro par lot depuis l'admin.
+  if (!function_exists('tag_id_from_tag_name'))
+  {
+    include_once(PHPWG_ROOT_PATH . 'admin/include/functions.php');
+  }
+
+  $now = date('Y-m-d H:i:s');
+
+  foreach ($missing_names as $name)
+  {
+    try
+    {
+      $tag_id = tag_id_from_tag_name($name);
+
+      $already_attached = query2array('
+SELECT tag_id FROM '.IMAGE_TAG_TABLE.'
+  WHERE image_id = '.$image_id.' AND tag_id = '.intval($tag_id).'
+;', null, 'tag_id');
+
+      if (empty($already_attached))
+      {
+        pwg_query('
+INSERT INTO '.IMAGE_TAG_TABLE.' (image_id, tag_id)
+VALUES ('.$image_id.', '.intval($tag_id).')
+;');
+      }
+
+      pwg_query('
+INSERT INTO '.FACETAG_PERSON_TAGS_TABLE.' (tag_id, is_face_tag, source, example_image_id, updated_at)
+VALUES ('.intval($tag_id).', 1, \'auto\', '.$image_id.', \''.$now.'\')
+ON DUPLICATE KEY UPDATE
+  example_image_id = IF(source=\'manual\', example_image_id, VALUES(example_image_id)),
+  updated_at = IF(source=\'manual\', updated_at, VALUES(updated_at))
+;');
+    }
+    catch (\Throwable $e)
+    {
+      error_log('[face_tag] facetag_auto_sync_current_image_tags : échec création tag pour "'.$name.'" (image '.$image_id.') : '.$e->getMessage());
+    }
+  }
 }
 
 // ==================== EXCLUSION DES TAGS VISAGE (helper partagé) ====================
