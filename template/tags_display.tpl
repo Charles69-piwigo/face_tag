@@ -75,7 +75,7 @@
             var $toggle = $('<span class="facetag-cat-toggle">').html(hasKids ? '&#9658;' : '&nbsp;');
             if (node.is_virtual) { $toggle.addClass('facetag-virtual'); }
             var $label  = $('<span class="facetag-cat-label">').text(node.name).attr('data-id', node.id);
-            if (node.is_virtual) { $label.attr('title', '{'Album virtuel (sans dossier lié)'|@translate}'); }
+            if (node.is_virtual) { $label.attr('title', '{'Album virtuel (sans dossier lié)'|@translate|escape:'javascript'}'); }
             $li.append($toggle).append($label);
             if (hasKids) {
               var $sub = renderNodes(node.children).hide();
@@ -175,14 +175,14 @@
 
   function runChunk() {
     if (stopRequested) {
-      $status.text('{'Arrêt demandé — ce qui a déjà été traité reste enregistré.'|@translate}');
+      $status.text('{'Arrêt demandé — ce qui a déjà été traité reste enregistré.'|@translate|escape:'javascript'}');
       finish();
       return;
     }
 
     fetchJSON('facetag_sync_chunk=1').done(function(data) {
       if (data.error) {
-        $status.text('{'Erreur'|@translate}: ' + data.error + (data.message ? ' — ' + data.message : ''));
+        $status.text('{'Erreur'|@translate|escape:'javascript'}: ' + data.error + (data.message ? ' — ' + data.message : ''));
         finish();
         return;
       }
@@ -190,19 +190,19 @@
       var percent = data.total > 0 ? Math.floor((data.index / data.total) * 100) : 100;
       $bar.removeClass('facetag-indeterminate').css('width', percent + '%');
       $status.text(
-        percent + '% — ' + data.index + '/' + data.total + ' {'photos analysées'|@translate}'
+        percent + '% — ' + data.index + '/' + data.total + ' {'photos analysées'|@translate|escape:'javascript'}'
         + (data.last_file ? ' — ' + data.last_file : '')
       );
 
       if (data.done) {
-        var msg = '{'Synchronisation terminée'|@translate} : '
-          + data.images_scanned + ' {'photos analysées'|@translate}, '
-          + data.tags_found + ' {'tags visage identifiés'|@translate}';
+        var msg = '{'Synchronisation terminée'|@translate|escape:'javascript'} : '
+          + data.images_scanned + ' {'photos analysées'|@translate|escape:'javascript'}, '
+          + data.tags_found + ' {'tags visage identifiés'|@translate|escape:'javascript'}';
         if (data.unresolved_count > 0) {
-          msg += ', ' + data.unresolved_count + ' {'visages sans tag correspondant'|@translate}';
+          msg += ', ' + data.unresolved_count + ' {'visages sans tag correspondant'|@translate|escape:'javascript'}';
         }
         if (data.images_failed > 0) {
-          msg += ' — ' + data.images_failed + ' {'photo(s) en erreur (voir le journal du serveur)'|@translate}';
+          msg += ' — ' + data.images_failed + ' {'photo(s) en erreur (voir le journal du serveur)'|@translate|escape:'javascript'}';
         }
         $bar.css('width', '100%');
         $status.text(msg);
@@ -214,13 +214,13 @@
       runChunk();
     }).fail(function(jqXHR) {
       var detail = jqXHR && jqXHR.responseText ? jqXHR.responseText.substring(0, 200) : '';
-      $status.text('{'Erreur réseau — nouvel essai automatique, le travail déjà fait reste enregistré.'|@translate}' + (detail ? ' (' + detail + ')' : ''));
+      $status.text('{'Erreur réseau — nouvel essai automatique, le travail déjà fait reste enregistré.'|@translate|escape:'javascript'}' + (detail ? ' (' + detail + ')' : ''));
       setTimeout(runChunk, 3000);
     });
   }
 
   function finish() {
-    $startBtn.prop('disabled', false).text('{'Synchroniser la table des tags visage'|@translate}');
+    $startBtn.prop('disabled', false).text('{'Synchroniser la table des tags visage'|@translate|escape:'javascript'}');
     $stopBtn.hide();
     $bar.removeClass('facetag-indeterminate');
   }
@@ -231,22 +231,22 @@
 
     stopRequested = false;
     $reloadBtn.hide();
-    $startBtn.prop('disabled', true).text('{'Synchronisation en cours...'|@translate}');
+    $startBtn.prop('disabled', true).text('{'Synchronisation en cours...'|@translate|escape:'javascript'}');
     $stopBtn.show();
     $progress.show();
     $bar.addClass('facetag-indeterminate');
-    $status.text('{'Démarrage — comptage des photos en cours, ça peut prendre quelques secondes sur un gros album, merci de patienter...'|@translate}');
+    $status.text('{'Démarrage — comptage des photos en cours, ça peut prendre quelques secondes sur un gros album, merci de patienter...'|@translate|escape:'javascript'}');
 
     fetchJSON('facetag_sync_start=1&cat_id=' + encodeURIComponent(catId) + '&subcats_included=' + subcats)
       .done(function(data) {
         if (data.error) {
           $bar.removeClass('facetag-indeterminate');
-          $status.text('{'Erreur'|@translate}: ' + data.error + (data.message ? ' — ' + data.message : ''));
+          $status.text('{'Erreur'|@translate|escape:'javascript'}: ' + data.error + (data.message ? ' — ' + data.message : ''));
           finish();
           return;
         }
         if (data.done) {
-          $status.text('{'Aucune photo à traiter dans ce périmètre.'|@translate}');
+          $status.text('{'Aucune photo à traiter dans ce périmètre.'|@translate|escape:'javascript'}');
           finish();
           return;
         }
@@ -254,7 +254,7 @@
       })
       .fail(function(jqXHR) {
         var detail = jqXHR && jqXHR.responseText ? jqXHR.responseText.substring(0, 200) : '';
-        $status.text('{'Erreur au démarrage de la synchronisation.'|@translate}' + (detail ? ' (' + detail + ')' : ''));
+        $status.text('{'Erreur au démarrage de la synchronisation.'|@translate|escape:'javascript'}' + (detail ? ' (' + detail + ')' : ''));
         finish();
       });
   });
@@ -327,14 +327,14 @@
   $reloadBtn.on('click', function() { window.location.reload(); });
 
   function finish() {
-    $startBtn.prop('disabled', false).text('{'Tenter une resynchronisation des métadonnées sur ces photos uniquement'|@translate}');
+    $startBtn.prop('disabled', false).text('{'Tenter une resynchronisation des métadonnées sur ces photos uniquement'|@translate|escape:'javascript'}');
     $stopBtn.hide();
     $bar.removeClass('facetag-indeterminate');
   }
 
   function runChunk() {
     if (stopRequested) {
-      $status.text('{'Arrêt demandé — ce qui a déjà été traité reste enregistré.'|@translate}');
+      $status.text('{'Arrêt demandé — ce qui a déjà été traité reste enregistré.'|@translate|escape:'javascript'}');
       finish();
       return;
     }
@@ -342,7 +342,7 @@
     fetchJSON('facetag_resync_chunk=1').done(function(data) {
       if (data.error) {
         $bar.removeClass('facetag-indeterminate');
-        $status.text('{'Erreur'|@translate}: ' + data.error + (data.message ? ' — ' + data.message : ''));
+        $status.text('{'Erreur'|@translate|escape:'javascript'}: ' + data.error + (data.message ? ' — ' + data.message : ''));
         finish();
         return;
       }
@@ -350,16 +350,16 @@
       var percent = data.total > 0 ? Math.floor((data.index / data.total) * 100) : 100;
       $bar.removeClass('facetag-indeterminate').css('width', percent + '%');
       $status.text(
-        percent + '% — ' + data.index + '/' + data.total + ' {'photos traitées'|@translate}'
+        percent + '% — ' + data.index + '/' + data.total + ' {'photos traitées'|@translate|escape:'javascript'}'
         + (data.last_file ? ' — ' + data.last_file : '')
       );
 
       if (data.done) {
-        var msg = '{'Resynchronisation terminée'|@translate} : '
-          + data.images_processed + ' {'photos traitées'|@translate}, '
-          + data.resolved_count + ' {'discordance(s) résolue(s)'|@translate}';
+        var msg = '{'Resynchronisation terminée'|@translate|escape:'javascript'} : '
+          + data.images_processed + ' {'photos traitées'|@translate|escape:'javascript'}, '
+          + data.resolved_count + ' {'discordance(s) résolue(s)'|@translate|escape:'javascript'}';
         if (data.images_failed > 0) {
-          msg += ' — ' + data.images_failed + ' {'photo(s) en erreur (voir le journal du serveur)'|@translate}';
+          msg += ' — ' + data.images_failed + ' {'photo(s) en erreur (voir le journal du serveur)'|@translate|escape:'javascript'}';
         }
         $bar.css('width', '100%');
         $status.text(msg);
@@ -371,7 +371,7 @@
       runChunk();
     }).fail(function(jqXHR) {
       var detail = jqXHR && jqXHR.responseText ? jqXHR.responseText.substring(0, 200) : '';
-      $status.text('{'Erreur réseau — nouvel essai automatique, le travail déjà fait reste enregistré.'|@translate}' + (detail ? ' (' + detail + ')' : ''));
+      $status.text('{'Erreur réseau — nouvel essai automatique, le travail déjà fait reste enregistré.'|@translate|escape:'javascript'}' + (detail ? ' (' + detail + ')' : ''));
       setTimeout(runChunk, 3000);
     });
   }
@@ -379,22 +379,22 @@
   $startBtn.on('click', function() {
     stopRequested = false;
     $reloadBtn.hide();
-    $startBtn.prop('disabled', true).text('{'Resynchronisation en cours...'|@translate}');
+    $startBtn.prop('disabled', true).text('{'Resynchronisation en cours...'|@translate|escape:'javascript'}');
     $stopBtn.show();
     $progress.show();
     $bar.addClass('facetag-indeterminate');
-    $status.text('{'Démarrage...'|@translate}');
+    $status.text('{'Démarrage...'|@translate|escape:'javascript'}');
 
     fetchJSON('facetag_resync_start=1')
       .done(function(data) {
         if (data.error) {
           $bar.removeClass('facetag-indeterminate');
-          $status.text('{'Erreur'|@translate}: ' + data.error + (data.message ? ' — ' + data.message : ''));
+          $status.text('{'Erreur'|@translate|escape:'javascript'}: ' + data.error + (data.message ? ' — ' + data.message : ''));
           finish();
           return;
         }
         if (data.done) {
-          $status.text('{'Rien à traiter.'|@translate}');
+          $status.text('{'Rien à traiter.'|@translate|escape:'javascript'}');
           finish();
           return;
         }
@@ -402,7 +402,7 @@
       })
       .fail(function(jqXHR) {
         var detail = jqXHR && jqXHR.responseText ? jqXHR.responseText.substring(0, 200) : '';
-        $status.text('{'Erreur au démarrage.'|@translate}' + (detail ? ' (' + detail + ')' : ''));
+        $status.text('{'Erreur au démarrage.'|@translate|escape:'javascript'}' + (detail ? ' (' + detail + ')' : ''));
         finish();
       });
   });
@@ -415,7 +415,7 @@
 {/footer_script}
 {/if}
 
-<form method="post" action="" onsubmit="return confirm('{'Effacer toute la table des tags visage ? Cette action est irréversible.'|@translate}');">
+<form method="post" action="" onsubmit="return confirm('{'Effacer toute la table des tags visage ? Cette action est irréversible.'|@translate|escape:'javascript'}');">
   <fieldset>
     <legend>{'Réinitialisation des visages'|@translate}</legend>
 

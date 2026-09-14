@@ -12,7 +12,13 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
- version 2.3a - 18/08/2026 NON DIFFUSEE
+ version 2.4 - 14/09/2026
+      corrigé : bug JS (apostrophe dans une traduction cassait la page
+      "Affichage des tags") - merci Gvf63
+      ajouté traduction italienne (it_IT) - merci Gvf63
+      ajouté fichier manquant language/en_UK/index.php
+
+ version 2.3a - 18/08/2026
       ajout auto des tags visage aux tags pwg s'ils n'y sont pas
       activé par $conf['face_tag_check'] = true;
 
