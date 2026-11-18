@@ -1,4 +1,7 @@
 <?php
+// +-----------------------------------------------------------------------+
+// | Plugin face_tag - File lingua italiana                                |
+// +-----------------------------------------------------------------------+
 
 // boutons
 $lang['Afficher les visages tagués'] = 'Mostra le facce taggate';
@@ -16,6 +19,7 @@ $lang['Afficher le bouton "Afficher les visages"'] = 'Visualizza il bottone "Vis
 $lang['Mode d\'affichage des visages :'] = 'Modalità visualizzazione volti:';
 $lang['Afficher/masquer à chaque clic (bouton temporaire)'] = 'Visualizza/nascondi con un clic (Temporaneo)';
 $lang['Activer/désactiver globalement (interrupteur persistant)'] = 'Abilita/Disabilita globalmente (Persistente)';
+$lang['Voir en survolant'] = 'Visualizza passando il puntatore'; 
 $lang['En mode interrupteur, les visages restent affichés...'] = 'In modo persistente i volti vengono visualizzati su tutte le foto fino alla disattivazione della funzione.';
 $lang['Apparence du rectangle'] = 'Aspetto riquadro';
 $lang['Couleur du cadre :'] = 'Colore riquadro :';
@@ -35,17 +39,20 @@ $lang['Couleur de l\'icône inactif & tag existant :'] = 'Colore icona "Inattiva
 $lang['Paramètres'] = 'Impostazioni';
 $lang['Modes de fonctionnement'] = 'Modalità di funzionamento';
 $lang['Affichage temporaire ou Affichage permanent'] = 'Visualizzazione temporanea o permanente';
-$lang['On peut utiliser le plugin de deux façons :'] = 'Il plugin può essere utilizzato in due modalità:';
+$lang['On peut utiliser le plugin de trois façons :'] = 'Il plugin può essere utilizzato in tre modalità:';
 $lang['Affichage temporaire :'] = 'Visualizzazione temporanea:';
 $lang['Dans ce mode cliquez sur le bouton pour afficher les visages, un deuxième clic enlève l\'affichage'] = 'In questa modalità premendo il bottone vengono visualizzati i volti, ripremendolo la visualizzazione viene disattivata.';
 $lang['Quand on change de photo, il faut recliquer sur le bouton pour afficher les visages'] = 'Cambiando la foto è necessario ripremere il pulsante per visualizzare i volti.';
 $lang['Affichage persistant :'] = 'Visualizzazione persistente:';
 $lang['Dans ce mode le bouton fonctionne comme un interrupteur, si des visages sont tagués sur la photo ils s\'affichent, quelle que soit la photo'] = 'In questa modalità premendo il bottone si attiva permanentemente la visualizzazione dei volti. La visualizzazione rimane attiva anche cambiando foto.';
 $lang['Un deuxième clic stoppe l\'affichage des visages'] = 'Ripremendo il bottone la visualizzazione viene disattivata.';
+$lang['Dans ce mode, les visages sont étiquetés lors du survol des zones qui les délimitent'] = 'In questa modalità, i volti vengono contrassegnati quando si passa il mouse sulle aree che li delimitano.';
+$lang['Vous pouvez toujours activer ou désactiver le marquage en cliquant sur le bouton'] = 'Si può comunque attivare o disattivare il tagging cliccando sul pulsante.';
 $lang['bouton voir les XMP'] = 'Visualizza il bottone XMP';
 $lang['Quand il est affiché ce bouton est le plus à gauche sur la barre de navigation, il affiche un popup avec toutes les métadonnées XMP de la photo. Utile pour le débugage'] = 'Permette di attivare un bottone sulla barra di navigazione che visualizza i dati XMP in una finestra pop up. Utile per il debug.';
 $lang['Apparences du rectangle et du libellé'] = 'Aspetto riquadro e etichetta';
 $lang['Définir les caractéristiques du cadre et du libellé.'] = 'Definisce le caratteristiche del riquadro e dell\'etichetta.';
+$lang['Important'] = 'Importante';
 $lang['N\'oubliez pas d\'enregistrer les modifications !!!'] = 'Non dimenticare di salvare la configurazione  !!!';
 
 $lang['Généralités'] = 'Informazioni generali';
@@ -131,7 +138,7 @@ $lang['Effacer la table des tags visage'] = 'Pulisce la tabella dei tag dei volt
 $lang['Table des tags visage réinitialisée : plus aucun tag n\'est marqué comme tag visage. Relancez une synchronisation pour la repeupler.'] = 'Ripristino della tabella dei tag dei volti: nessun tag è più contrassegnato come tag facciale. Esegui una sincronizzazione per ripopolarla.';
 
 // aide - onglet Affichage des tags
-$lang['En mode interrupteur, la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'] = 'In modalità persistente, il colore dell\'icona indica lo stato del pulsante: un colore quando è attivo, un altro quando è inattivo ma la foto visualizzata ha volti taggati. Entrambi i colori sono impostati in questa scheda. Se non sono disponibili tag l\'icona viene visualizzata in bianco';
+$lang['En mode interrupteur et \'Voir en survolant\', la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'] = 'In modalità persistente e in \'Visualizza passando il puntatore\', il colore dell\'icona indica lo stato del pulsante: un colore quando è attivo, un altro quando è inattivo ma la foto visualizzata ha volti taggati. Entrambi i colori sono impostati in questa scheda. Se non sono disponibili tag l\'icona viene visualizzata in bianco';
 $lang['Permet de masquer les tags visage dans le nuage de tags public, sans les supprimer : ils restent visibles et modifiables dans Administration > Tags.'] = 'Consente di nascondere i tag dei volti dal tag cloud senza eliminarli: rimangono visibili e modificabili in Administrazione > Tags.';
 $lang['Cette table fait la correspondance entre les tags Piwigo et les visages détectés dans le XMP des photos ; c\'est elle qui permet au plugin de savoir quels tags sont des tags visage. Il faut la (re)synchroniser après un import externe (digiKam, XnView...) ou une resynchronisation des métadonnées Piwigo.'] = 'Questa tabella abbina i tag Piwigo ai volti rilevati in Photo XMP; è ciò che consente al plugin di sapere quali tag sono tag facciali. Deve essere (ri)sincronizzata dopo un\'importazione esterna (digiKam, XnView...) o una risincronizzazione dei metadati Piwigo.';
 $lang['La synchronisation peut être restreinte à un album, et se déroule par petits lots, comme le plugin AlbumPilot : aucun risque de timeout, même sur une très grosse photothèque.'] = 'La sincronizzazione può essere limitata a un album e comunque viene eseguita in piccoli lotti, come il plugin AlbumPilot: nessun rischio di timeout, anche su una libreria di foto molto ampia.';
