@@ -1,6 +1,7 @@
 # Agent / IDE
 .claude/
 .vscode/
+.playwright-mcp/
 
 # Logs
 *.log
@@ -12,6 +13,7 @@ Thumbs.db
 
 # Doc interne (local uniquement)
 STRUCTURE.md
+CLAUDE.md
 
 # Dumps SQL
 *.sql

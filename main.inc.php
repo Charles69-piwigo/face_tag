@@ -12,6 +12,11 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+ version 2.4.1 - 28/09/2026
+      corrigé : libellé des boutons « Enregistrer » partagé avec d'autres plugins
+      (clé de traduction générique 'Enregistrer' → 'facetag_save') : Face Tag
+      changeait le bouton d'ip_location et de smart_albums_copier, et inversement
+
  version 2.4 - 14/09/2026
       corrigé : bug JS (apostrophe dans une traduction cassait la page
       "Affichage des tags") - merci Gvf63

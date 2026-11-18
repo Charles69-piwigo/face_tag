@@ -18,7 +18,7 @@
     </ul>
 
     <p style="text-align: left; margin-left: 40px;">
-      <input type="submit" name="submit_tags_display" value="{'Enregistrer'|@translate}">
+      <input type="submit" name="submit_tags_display" value="{'facetag_save'|@translate}">
     </p>
   </fieldset>
 

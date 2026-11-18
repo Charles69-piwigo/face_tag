@@ -9,7 +9,7 @@ $lang['Aide'] = 'Aiuto';
 $lang['Configuration enregistrée avec succès'] = 'Configurazione salvata con successo';
 
 $lang['Face Tag - Configuration générale'] = 'Face Tag - Configurazione generale';
-$lang['Enregistrer'] = 'Salvataggio configurazione';
+$lang['facetag_save'] = 'Salvataggio configurazione';
 $lang['Init'] = 'Valori di default';
 $lang['Bouton d\'interface'] = 'Funzionamento interfaccia';
 $lang['Afficher le bouton "Afficher les visages"'] = 'Visualizza il bottone "Visualizza volti"';

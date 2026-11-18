@@ -4,7 +4,7 @@
 
 <form method="post" action="" class="properties">
    <p style="text-align: left; margin-left: 40px;">
-    <input type="submit" name="submit" value="{'Enregistrer'|@translate}">
+    <input type="submit" name="submit" value="{'facetag_save'|@translate}">
     <input type="submit" name="reinit" value="{'Init'|@translate}">
   </p>
   <fieldset>
@@ -126,6 +126,6 @@
 </fieldset>
 
   <p style="text-align: left; margin-left: 40px;">
-    <input type="submit" name="submit" value="{'Enregistrer'|@translate}">
+    <input type="submit" name="submit" value="{'facetag_save'|@translate}">
   </p>
 </form>

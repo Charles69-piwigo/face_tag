@@ -8,7 +8,7 @@ $lang['Aide'] = 'Aide';
 $lang['Configuration enregistrée avec succès'] = 'Configuration enregistrée avec succès';
 
 $lang['Face Tag - Configuration générale'] = 'Face Tag - Configuration générale';
-$lang['Enregistrer'] = 'Enregistrer la configuration';
+$lang['facetag_save'] = 'Enregistrer la configuration';
 $lang['Init'] = 'Valeurs par défaut';
 $lang['Bouton d\'interface'] = 'Bouton d\'interface';
 $lang['Afficher le bouton "Afficher les visages"'] = 'Afficher le bouton "Afficher les visages"';
