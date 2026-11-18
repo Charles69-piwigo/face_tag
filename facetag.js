@@ -29,7 +29,7 @@
       var ajaxUrl = $(this).data('ajax-url');
       
       // MODE PERSISTENT : vérifier le localStorage
-      if (displayMode === 'persistent') {
+      if (displayMode === 'persistent' || displayMode === 'hover') {
         var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
         
         if (isPersistentActive) {
@@ -188,6 +188,10 @@
             boxShadow: '0 0 10px ' + hexToRgba(config.rect_color, config.rect_opacity * 0.5)
           });
 
+          if (displayMode === 'persistent' || displayMode === 'toggle') {
+            $overlay.css('opacity', 1);
+          }
+
         var labelBgRgba = hexToRgba(config.label_bg_color, config.label_bg_opacity);
         var paddingVertical = Math.max(3, Math.round(config.label_font_size * 0.3));
         var paddingHorizontal = Math.max(8, Math.round(config.label_font_size * 0.7));
@@ -274,7 +278,7 @@
     
     //--------------------------------------------------------------------------------------------------------
     // MODE PERSISTENT : afficher automatiquement si activé
-    if (displayMode === 'persistent') {
+    if (displayMode === 'persistent' || displayMode === 'hover') {
       var isPersistentActive = localStorage.getItem('facetag_persistent_mode') === 'true';
       //console.log('Mode persistant:', isPersistentActive);
       
@@ -343,7 +347,7 @@ $(document).on('click', '#facetag_show_xmp', function(e) {
         // Afficher une modale avec les données
         var jsonStr = JSON.stringify(data.result, null, 2);
         
-        var $modal = $('<div>')
+        var $modal = $('<div class="xmp_debug">')
           .css({
             position: 'fixed',
             top: '50%',
@@ -381,6 +385,7 @@ $(document).on('click', '#facetag_show_xmp', function(e) {
             borderRadius: '4px',
             overflow: 'auto',
             fontSize: '12px',
+            color: 'gray',
             fontFamily: 'monospace'
           })
           .text(jsonStr);
