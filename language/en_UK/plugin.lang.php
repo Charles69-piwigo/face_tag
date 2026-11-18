@@ -1,4 +1,8 @@
 <?php
+// +-----------------------------------------------------------------------+
+// | Plugin face_tag - English language file                               |
+// +-----------------------------------------------------------------------+
+
 // boutons
 $lang['Afficher les visages tagués'] = 'Show tagged faces';
 $lang['Voir les métadonnées XMP'] = 'View XMP metadata';
@@ -15,6 +19,7 @@ $lang['Afficher le bouton "Afficher les visages"'] = 'Show "Show faces" button';
 $lang['Mode d\'affichage des visages :'] = 'Face display mode:';
 $lang['Afficher/masquer à chaque clic (bouton temporaire)'] = 'Show/Hide on Click (Temporary Button)';
 $lang['Activer/désactiver globalement (interrupteur persistant)'] = 'Enable/Disable globally (Persistent Switch)';
+$lang['Voir en survolant'] = 'View by hovering'; 
 $lang['En mode interrupteur, les visages restent affichés...'] = 'In toggle mode, faces remain displayed on all photos until the next click.';
 $lang['Apparence du rectangle'] = 'Rectangle Appearance';
 $lang['Couleur du cadre :'] = 'Frame color:';
@@ -31,20 +36,23 @@ $lang['Afficher le bouton XMP'] = 'Show "View XMP" button - for debugging';
 $lang['Couleur de l\'icône active :'] = 'Active icon color:';
 $lang['Couleur de l\'icône inactif & tag existant :'] = 'Inactive icon & existing tag color:';
 
-$lang['Paramètres'] = 'Settings';
+$lang['Paramètres'] = 'Settings';$lang['Voir en survolant'] = 'Voir en survolant'; 
 $lang['Modes de fonctionnement'] = 'Operating modes';
 $lang['Affichage temporaire ou Affichage permanent'] = 'Temporary display or Permanent display';
-$lang['On peut utiliser le plugin de deux façons :'] = 'The plugin can be used in two ways:';
+$lang['On peut utiliser le plugin de trois façons :'] = 'The plugin can be used in three ways:';
 $lang['Affichage temporaire :'] = 'Temporary Display:';
 $lang['Dans ce mode cliquez sur le bouton pour afficher les visages, un deuxième clic enlève l\'affichage'] = 'In this mode, click the button to display faces. A second click removes the display.';
 $lang['Quand on change de photo, il faut recliquer sur le bouton pour afficher les visages'] = 'When you change photos, you must click the button again to display the faces.';
 $lang['Affichage persistant :'] = 'Persistent display:';
 $lang['Dans ce mode le bouton fonctionne comme un interrupteur, si des visages sont tagués sur la photo ils s\'affichent, quelle que soit la photo'] = 'In this mode, the button acts like a switch. If faces are tagged in the photo, they will be displayed, regardless of the photo.';
 $lang['Un deuxième clic stoppe l\'affichage des visages'] = 'A second click stops the display of faces.';
+$lang['Dans ce mode, les visages sont étiquetés lors du survol des zones qui les délimitent'] = 'In this mode, faces are tagged when hover the areas that delimit them';
+$lang['Vous pouvez toujours activer ou désactiver le marquage en cliquant sur le bouton'] = 'You can always turn tagging on or off by clicking the button';
 $lang['bouton voir les XMP'] = 'view XMP button';
 $lang['Quand il est affiché ce bouton est le plus à gauche sur la barre de navigation, il affiche un popup avec toutes les métadonnées XMP de la photo. Utile pour le débugage'] = 'When displayed, this button is the leftmost button on the navigation bar. It displays a popup with all the XMP metadata for the photo. Useful for debugging.';
 $lang['Apparences du rectangle et du libellé'] = 'Rectangle and Label appearance';
 $lang['Définir les caractéristiques du cadre et du libellé.'] = 'Define the characteristics of the frame and label.';
+$lang['Important'] = 'Important';
 $lang['N\'oubliez pas d\'enregistrer les modifications !!!'] = 'Don\'t forget to save your changes !!!';
 
 $lang['Généralités'] = 'General Information';
@@ -54,7 +62,7 @@ $lang['Il existe deux méthodes pour enregistrer les visages dans les métadonn�
 $lang['MPReg (Microsoft Photo Region)'] = 'MPReg (Microsoft Photo Region)';
 $lang['MWG-RS (Metadata Working Group - Region Schema).'] = 'MWG-RS (Metadata Working Group - Region Schema).';
 $lang['Ces méthodes sont utilisées par digiKam, Light Room, Apple Photos, ACDSee Photo Studio et feu-Picasa'] = 'These methods are used by digiKam, Lightroom, Apple Photos, ACDSee Photo Studio, and the now-defunct Picasa.';
-$lang['Ces programmes permettent d\'enregistrer les informations dans les métadonnées des photos'] = 'These programs allow you to save information in the photo metadata.';
+$lang['Ces programmes permettent d\'enregistrer les informations dans les métadonnées des photos'] = 'These programs allow you to save information in the photo metadata.';$lang['Voir en survolant'] = 'Voir en survolant'; 
 $lang['Face Tag détecte automatiquement la méthode utilisée.'] = 'Face Tag automatically detects the method used.';
 $lang['digiKam'] = 'digiKam';
 $lang['digiKam est un programme open source de catalogage et d\'édition de photos.'] = 'digiKam is an open-source photo cataloging and editing program.';
@@ -128,13 +136,11 @@ $lang['Effacer la table des tags visage'] = 'Clear the face tags table';
 $lang['Table des tags visage réinitialisée : plus aucun tag n\'est marqué comme tag visage. Relancez une synchronisation pour la repeupler.'] = 'Face tags table reset: no tag is marked as a face tag anymore. Run a synchronization to repopulate it.';
 
 // aide - onglet Affichage des tags
-$lang['En mode interrupteur, la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'] = 'In toggle mode, the icon color indicates the button state: one color when active, another when inactive but the displayed photo has tagged faces. Both colors are set in this tab.';
+$lang['En mode interrupteur et \'Voir en survolant\', la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'] = 'In toggle mode and \'View by hovering\', the icon color indicates the button state: one color when active, another when inactive but the displayed photo has tagged faces. Both colors are set in this tab.';
 $lang['Permet de masquer les tags visage dans le nuage de tags public, sans les supprimer : ils restent visibles et modifiables dans Administration > Tags.'] = 'Lets you hide face tags from the public tag cloud without deleting them: they remain visible and editable in Administration > Tags.';
 $lang['Cette table fait la correspondance entre les tags Piwigo et les visages détectés dans le XMP des photos ; c\'est elle qui permet au plugin de savoir quels tags sont des tags visage. Il faut la (re)synchroniser après un import externe (digiKam, XnView...) ou une resynchronisation des métadonnées Piwigo.'] = 'This table matches Piwigo tags to faces detected in photo XMP; it is what lets the plugin know which tags are face tags. It must be (re)synchronized after an external import (digiKam, XnView...) or a Piwigo metadata resynchronization.';
 $lang['La synchronisation peut être restreinte à un album, et se déroule par petits lots, comme le plugin AlbumPilot : aucun risque de timeout, même sur une très grosse photothèque.'] = 'Synchronization can be restricted to an album, and runs in small batches, like the AlbumPilot plugin: no risk of timeout, even on a very large photo library.';
 $lang['Si un visage détecté dans le XMP ne trouve aucun tag Piwigo correspondant sur sa photo, la synchronisation tente automatiquement de corriger le problème (relecture des métadonnées, puis création directe du tag si besoin). Les cas qui échouent malgré tout apparaissent dans cette liste.'] = 'If a face detected in the XMP has no matching Piwigo tag on its photo, the synchronization automatically tries to fix the problem (re-reading metadata, then creating the tag directly if needed). Cases that still fail appear in this list.';
 $lang['Un bouton permet de retenter la correction uniquement sur ces photos, sans relancer une synchronisation complète.'] = 'A button lets you retry the correction on just these photos, without running a full synchronization again.';
 $lang['Efface entièrement la table des tags visage. Utile uniquement en cas de problème : la synchronisation habituelle suffit dans l\'immense majorité des cas.'] = 'Completely clears the face tags table. Only useful in case of trouble: the usual synchronization is enough in the vast majority of cases.';
-
-
-
+?>
