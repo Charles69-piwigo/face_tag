@@ -29,6 +29,9 @@
             <option value="persistent" {if $FACES_DISPLAY_MODE == 'persistent'}selected{/if}>
             {'Activer/désactiver globalement (interrupteur persistant)'|@translate}
             </option>
+            <option value="hover" {if $FACES_DISPLAY_MODE == 'hover'}selected{/if}>
+            {'Voir en survolant'|@translate}
+            </option>
           </select>
         <p class="formHint">{'En mode interrupteur, les visages restent affichés...'|@translate}</p>
       </li>

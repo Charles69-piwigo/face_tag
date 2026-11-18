@@ -308,7 +308,11 @@ SELECT image_id, tag_id FROM '.IMAGE_TAG_TABLE.'
     {
       try
       {
-        $tag_id = tag_id_from_tag_name($name);
+        // tag_id_from_tag_name() insère le nom tel quel dans ses requêtes SQL
+        // (Piwigo l'appelle avec des données déjà échappées) : sans
+        // échappement, un nom avec apostrophe (ex: O'Brien) fait planter la
+        // requête et le visage reste "non résolu" pour toujours (issue #4).
+        $tag_id = tag_id_from_tag_name(pwg_db_real_escape_string($name));
         $all_tags[$tag_id] = mb_strtolower(trim($name));
 
         $already_attached = query2array('

@@ -282,8 +282,8 @@
     </tr>
     {foreach from=$FACETAG_UNRESOLVED_LIST item=entry}
     <tr>
-      <td><a href="{$entry.U_EDIT}" target="_blank">{$entry.FILE}</a></td>
-      <td>{$entry.FACES}</td>
+      <td><a href="{$entry.U_EDIT}" target="_blank">{$entry.FILE|escape}</a></td>
+      <td>{$entry.FACES|escape}</td>
       <td>{if !empty($entry.TAGS)}{$entry.TAGS}{else}<em>{'aucun'|@translate}</em>{/if}</td>
     </tr>
     {/foreach}

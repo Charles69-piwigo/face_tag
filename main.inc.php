@@ -12,6 +12,15 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+ version 2.4.2 - 18/11/2026
+      ajouté : mode d'affichage « Voir en survolant » (les cadres des visages
+      n'apparaissent qu'au survol, utile pour les photos de groupe) - merci Gvf63 (PR #3)
+      corrigé : nom de visage avec apostrophe jamais transformé en tag lors de la
+      correction automatique (synchro et auto-sync à l'affichage) - issue #4
+      corrigé : noms de visages non échappés dans la liste des visages non résolus
+      corrigé : fichiers de langue sans « ?> » final (les lignes vides qui le
+      suivaient corrompaient les images servies par private_derivative_protection)
+
  version 2.4.1 - 28/09/2026
       corrigé : libellé des boutons « Enregistrer » partagé avec d'autres plugins
       (clé de traduction générique 'Enregistrer' → 'facetag_save') : Face Tag
@@ -337,7 +346,8 @@ SELECT name FROM '.TAGS_TABLE.'
   {
     try
     {
-      $tag_id = tag_id_from_tag_name($name);
+      // nom échappé : voir facetag_retry_and_record_unresolved() (issue #4)
+      $tag_id = tag_id_from_tag_name(pwg_db_real_escape_string($name));
 
       $already_attached = query2array('
 SELECT tag_id FROM '.IMAGE_TAG_TABLE.'
