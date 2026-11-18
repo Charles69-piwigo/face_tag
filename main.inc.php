@@ -12,7 +12,7 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
- version 2.4.2 - 18/11/2026
+ version 2.5 - 18/11/2026 - regroupe 2.4.1 et 2.4.2
       ajouté : mode d'affichage « Voir en survolant » (les cadres des visages
       n'apparaissent qu'au survol, utile pour les photos de groupe) - merci Gvf63 (PR #3)
       corrigé : nom de visage avec apostrophe jamais transformé en tag lors de la
@@ -20,8 +20,6 @@ Has Settings: webmaster
       corrigé : noms de visages non échappés dans la liste des visages non résolus
       corrigé : fichiers de langue sans « ?> » final (les lignes vides qui le
       suivaient corrompaient les images servies par private_derivative_protection)
-
- version 2.4.1 - 28/09/2026
       corrigé : libellé des boutons « Enregistrer » partagé avec d'autres plugins
       (clé de traduction générique 'Enregistrer' → 'facetag_save') : Face Tag
       changeait le bouton d'ip_location et de smart_albums_copier, et inversement
