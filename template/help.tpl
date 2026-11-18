@@ -111,7 +111,7 @@
     <div class="help-section">
       <h4>{'Modes de fonctionnement'|@translate}</h4>
       <h4>{'Affichage temporaire ou Affichage permanent'|@translate}</h4>
-      <p>{'On peut utiliser le plugin de deux façons :'|@translate} </p>
+      <p>{'On peut utiliser le plugin de trois façons :'|@translate} </p>
       <ul>
         <li><strong>{'Affichage temporaire :'|@translate}</strong></li>
         <p>{'Dans ce mode cliquez sur le bouton pour afficher les visages, un deuxième clic enlève l\'affichage'|@translate} </p>
@@ -119,8 +119,11 @@
         <li><strong>{'Affichage persistant :'|@translate}</strong></li>
         <p>{'Dans ce mode le bouton fonctionne comme un interrupteur, si des visages sont tagués sur la photo ils s\'affichent, quelle que soit la photo'|@translate} </p>
         <p>{'Un deuxième clic stoppe l\'affichage des visages'|@translate} </p>
+        <li><strong>{'Voir en survolant'|@translate}:</strong></li>
+        <p>{'Dans ce mode, les visages sont étiquetés lors du survol des zones qui les délimitent'|@translate} </p>
+        <p>{'Vous pouvez toujours activer ou désactiver le marquage en cliquant sur le bouton'|@translate} </p>
       </ul>
-      <p>{'En mode interrupteur, la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'|@translate}</p>
+      <p>{'En mode interrupteur et \'Voir en survolant\', la couleur de l\'icône indique l\'état du bouton : une couleur quand il est actif, une autre quand il est inactif mais que la photo affichée a des visages tagués. Ces deux couleurs se règlent dans cet onglet.'|@translate}</p>
     </div>
 
     <div class="help-section">
@@ -134,7 +137,7 @@
     </div>
 
     <div class="help-tip">
-      <strong> Important  :</strong> {'N\'oubliez pas d\'enregistrer les modifications !!!'|@translate}
+      <strong> {'Important'|@translate} :</strong> {'N\'oubliez pas d\'enregistrer les modifications !!!'|@translate}
     </div>
   </div>
 
