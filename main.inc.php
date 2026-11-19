@@ -12,7 +12,7 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
- version 2.5.1 - 19/11/2026
+ version 2.5a - 19/11/2026 - correction 2.5.1
       corrigé : le masquage des tags visage ne s'appliquait pas au widget « Tags »
       de PWG_Stuffs, sauf surcharge manuelle de stuffs_tags.tpl dans le thème ;
       face_tag filtre désormais lui-même ce widget, quel que soit le thème
