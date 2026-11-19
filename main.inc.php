@@ -12,6 +12,11 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+ version 2.5.1 - 19/11/2026
+      corrigé : le masquage des tags visage ne s'appliquait pas au widget « Tags »
+      de PWG_Stuffs, sauf surcharge manuelle de stuffs_tags.tpl dans le thème ;
+      face_tag filtre désormais lui-même ce widget, quel que soit le thème
+
  version 2.5 - 18/11/2026 - regroupe 2.4.1 et 2.4.2
       ajouté : mode d'affichage « Voir en survolant » (les cadres des visages
       n'apparaissent qu'au survol, utile pour les photos de groupe) - merci Gvf63 (PR #3)
@@ -412,7 +417,103 @@ add_event_handler('init', 'facetag_assign_excluded_tag_ids_to_template');
 function facetag_assign_excluded_tag_ids_to_template()
 {
   global $template;
-  $template->assign('FACETAG_EXCLUDED_TAG_IDS', facetag_get_excluded_tag_ids());
+
+  $excluded_ids = facetag_get_excluded_tag_ids();
+  $template->assign('FACETAG_EXCLUDED_TAG_IDS', $excluded_ids);
+
+  if (!empty($excluded_ids))
+  {
+    // Widget "Tags" de PWG_Stuffs : il appelle get_available_tags() et affiche
+    // son bloc dans la même fonction, sans hook entre les deux. On insère donc,
+    // par préfiltre sur le template 'stuffs' (stuffs_blocks.tpl), un appel à
+    // {facetag_filter_stuffs_tags} juste avant l'inclusion du bloc Tags.
+    // Fonctionne avec le stuffs_tags.tpl d'origine comme avec une surcharge de thème.
+    $template->smarty->registerPlugin('function', 'facetag_filter_stuffs_tags', 'facetag_smarty_filter_stuffs_tags');
+    $template->set_prefilter('stuffs', 'facetag_prefilter_stuffs_blocks');
+  }
+}
+
+/**
+ * Préfiltre Smarty du template 'stuffs' (PWG_Stuffs) : ajoute le filtrage des
+ * tags visage avant l'inclusion du bloc stuffs_tags.tpl. Sans effet si le
+ * motif n'est pas trouvé (stuffs_blocks.tpl surchargé autrement).
+ */
+function facetag_prefilter_stuffs_blocks($source, $smarty)
+{
+  return preg_replace(
+    '/\{include\s+file=\$block\.TEMPLATE\s*\}/',
+    "{if \$block.TEMPLATE == 'stuffs_tags.tpl'}{facetag_filter_stuffs_tags}{/if}$0",
+    $source
+  );
+}
+
+/**
+ * Fonction Smarty {facetag_filter_stuffs_tags} : retire les tags visage des
+ * variables 'tags' et 'letters' du template courant (héritées par l'include).
+ */
+function facetag_smarty_filter_stuffs_tags($params, $smarty_tpl)
+{
+  $excluded_ids = $smarty_tpl->getTemplateVars('FACETAG_EXCLUDED_TAG_IDS');
+  if (empty($excluded_ids))
+  {
+    return '';
+  }
+
+  $tags = $smarty_tpl->getTemplateVars('tags');
+  if (is_array($tags))
+  {
+    $smarty_tpl->assign('tags', facetag_strip_tags_list($tags, $excluded_ids));
+  }
+
+  $letters = $smarty_tpl->getTemplateVars('letters');
+  if (is_array($letters))
+  {
+    $smarty_tpl->assign('letters', facetag_strip_tags_letters($letters, $excluded_ids));
+  }
+
+  return '';
+}
+
+/**
+ * Retire d'une liste plate de tags ceux dont l'id est exclu.
+ */
+function facetag_strip_tags_list($tags, $excluded_ids)
+{
+  return array_values(array_filter($tags, function($tag) use ($excluded_ids) {
+    return !isset($tag['id']) || !in_array($tag['id'], $excluded_ids);
+  }));
+}
+
+/**
+ * Mode "lettres" : filtre les tags de chaque lettre, supprime les lettres
+ * devenues vides en reportant leur changement de colonne sur la suivante.
+ */
+function facetag_strip_tags_letters($letters, $excluded_ids)
+{
+  $filtered_letters = array();
+  $pending_change_column = false;
+  foreach ($letters as $letter)
+  {
+    if (isset($letter['tags']) && is_array($letter['tags']))
+    {
+      $letter['tags'] = facetag_strip_tags_list($letter['tags'], $excluded_ids);
+    }
+    if (empty($letter['tags']))
+    {
+      if (!empty($letter['CHANGE_COLUMN']))
+      {
+        $pending_change_column = true;
+      }
+      continue;
+    }
+    if ($pending_change_column)
+    {
+      $letter['CHANGE_COLUMN'] = true;
+      $pending_change_column = false;
+    }
+    $filtered_letters[] = $letter;
+  }
+  return $filtered_letters;
 }
 
 // ==================== FILTRAGE DU NUAGE DE TAGS PUBLIC (tags.php) ====================
@@ -433,31 +534,14 @@ function facetag_filter_public_tag_cloud()
   $tags = $template->get_template_vars('tags');
   if (is_array($tags) && count($tags) > 0)
   {
-    $tags = array_values(array_filter($tags, function($tag) use ($excluded_ids) {
-      return !in_array($tag['id'], $excluded_ids);
-    }));
-    $template->assign('tags', $tags);
+    $template->assign('tags', facetag_strip_tags_list($tags, $excluded_ids));
   }
 
   // Mode "lettres" : groupes de lettres contenant chacun une liste de tags
   $letters = $template->get_template_vars('letters');
   if (is_array($letters) && count($letters) > 0)
   {
-    $filtered_letters = array();
-    foreach ($letters as $letter)
-    {
-      if (isset($letter['tags']) && is_array($letter['tags']))
-      {
-        $letter['tags'] = array_values(array_filter($letter['tags'], function($tag) use ($excluded_ids) {
-          return !in_array($tag['id'], $excluded_ids);
-        }));
-      }
-      if (!empty($letter['tags']))
-      {
-        $filtered_letters[] = $letter;
-      }
-    }
-    $template->assign('letters', $filtered_letters);
+    $template->assign('letters', facetag_strip_tags_letters($letters, $excluded_ids));
   }
 }
 
