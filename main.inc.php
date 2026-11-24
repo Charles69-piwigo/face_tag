@@ -12,7 +12,7 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
- version 2.6 - 24/11/2026 - regroupe 2.5a.1 et 2.5a.2
+ version 2.6 - 24/11/2026 - regroupe 2.5a.1, 2.5a.2 et 2.6.1
       corrigé : cadres de visage mal placés ou manquants sur certaines photos. Les noms et
       les zones étaient lus séparément dans tout le XMP puis associés dans l'ordre : un nom
       sans rectangle (Microsoft), un visage sans nom, une région de mise au point ou une
@@ -27,6 +27,11 @@ Has Settings: webmaster
       protections sont retirées, la colonne est gardée pour compatibilité avec
       face_tag_editor (toujours 'auto'). Texte du bouton « Effacer la table des tags
       visage » corrigé : il annonçait des corrections manuelles perdues qui n'existent pas
+      corrigé : la désinstallation de face_tag supprimait la table des tags visage
+      (facetag_person_tags), partagée avec face_tag_editor et tag_manager ; leurs tags
+      visage redevenaient alors des tags ordinaires. Elle est désormais gardée si
+      face_tag_editor est installé (il continue de la tenir à jour) ; tag_manager seul
+      ne la justifie pas (il ne fait qu'y lire, et relève lui-même les cadres)
 
  version 2.5a - 19/11/2026 - correction 2.5.1
       corrigé : le masquage des tags visage ne s'appliquait pas au widget « Tags »

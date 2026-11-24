@@ -40,8 +40,21 @@ function plugin_uninstall()
     global $prefixeTable;
 
     conf_delete_param('face_tag_config');
-    pwg_query('DROP TABLE IF EXISTS ' . $prefixeTable . 'facetag_person_tags');
     pwg_query('DROP TABLE IF EXISTS ' . $prefixeTable . 'facetag_unresolved_faces');
+
+    // facetag_person_tags (registre des tags visage) est partagée. Elle est gardée si
+    // face_tag_editor est installé (ligne dans la table des plugins, actif ou non) : il
+    // continue de la tenir à jour (ajout à l'enregistrement, retrait quand un cadre
+    // disparaît). tag_manager seul ne la justifie pas : il ne fait qu'y lire et supprimer,
+    // la table serait figée, et il relève lui-même les cadres à son indexation.
+    $editor = query2array('
+SELECT id FROM ' . PLUGINS_TABLE . '
+  WHERE id = \'face_tag_editor\'
+;');
+    if (empty($editor))
+    {
+        pwg_query('DROP TABLE IF EXISTS ' . $prefixeTable . 'facetag_person_tags');
+    }
 }
 
 // Désactivation du plugin
