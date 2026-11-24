@@ -29,7 +29,9 @@ Page du plugin : <https://piwigo.org/ext/extension_view.php?eid=1051>
 - MWG-RS (Metadata Working Group – Region Schema) ;
 - MPReg (Microsoft Photo Region).
 
-Ces deux formats sont ceux qu'utilisent digiKam, Lightroom, Apple Photos, ACDSee Photo Studio et Picasa. Le format est détecté automatiquement. Les régions sont lues dans le XMP des fichiers **JPEG**.
+Ces deux formats sont ceux qu'utilisent digiKam, Lightroom, Apple Photos, ACDSee Photo Studio et Picasa. Le format est détecté automatiquement. Les régions sont lues dans le XMP des fichiers **JPEG**, y compris un éventuel « Extended XMP ».
+
+Chaque région est lue en entier, avec son nom et son cadre (depuis la version 2.6). Une région n'est prise que si c'est un visage, avec un nom et une zone : un nom sans cadre, un visage non identifié ou une zone de mise au point sont ignorés, sans décaler les autres noms. Quand digiKam écrit le même visage dans les deux formats, il n'est affiché qu'une fois.
 
 ### Masquage des tags visage
 
@@ -71,6 +73,7 @@ Français, anglais, italien (merci Gvf63).
 ### Plugins liés
 
 - [face_tag_editor](https://piwigo.org/ext/extension_view.php?eid=1053) : dessiner et nommer les visages depuis Piwigo, en écrivant les métadonnées dans le fichier. Partage avec face_tag la table des tags visage.
+- [tag_manager](https://piwigo.org/ext/extension_view.php?eid=1134) : ranger les tags hiérarchiques de digiKam. Il lit aussi la table des tags visage pour laisser les personnes de côté, et permet de retirer un tag marqué visage à tort (« Ce n'est pas un visage »).
 - PWG_Stuffs : son widget Tags respecte le masquage des tags visage.
 
 ---
@@ -100,7 +103,9 @@ Plugin page: <https://piwigo.org/ext/extension_view.php?eid=1051>
 - MWG-RS (Metadata Working Group – Region Schema);
 - MPReg (Microsoft Photo Region).
 
-These are the two formats used by digiKam, Lightroom, Apple Photos, ACDSee Photo Studio and Picasa. The format is detected automatically. Regions are read from the XMP of **JPEG** files.
+These are the two formats used by digiKam, Lightroom, Apple Photos, ACDSee Photo Studio and Picasa. The format is detected automatically. Regions are read from the XMP of **JPEG** files, including any "Extended XMP".
+
+Each region is read as a whole, with its name and its box (since version 2.6). A region is only used if it is a face with both a name and an area: a name without a box, an unidentified face or a focus area are ignored, without shifting the other names. When digiKam writes the same face in both formats, it is shown only once.
 
 ### Hiding face tags
 
@@ -142,4 +147,5 @@ French, English, Italian (thanks to Gvf63).
 ### Related plugins
 
 - [face_tag_editor](https://piwigo.org/ext/extension_view.php?eid=1053): draw and name faces from Piwigo, writing the metadata into the file. Shares the face tag table with face_tag.
+- [tag_manager](https://piwigo.org/ext/extension_view.php?eid=1134): organize digiKam's hierarchical tags. It also reads the face tag table to leave people aside, and can remove a tag wrongly marked as a face ("Not a face").
 - PWG_Stuffs: its Tags widget respects face tag hiding.

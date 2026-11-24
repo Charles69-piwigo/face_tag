@@ -13,6 +13,8 @@ function plugin_activate($plugin_id, $plugin_version, &$errors)
 {
     global $prefixeTable;
 
+    // Table partagée avec face_tag_editor et tag_manager ; `source` vaut toujours 'auto',
+    // gardée pour compatibilité (voir facetag_ensure_sync_tables()).
     pwg_query('
 CREATE TABLE IF NOT EXISTS ' . $prefixeTable . 'facetag_person_tags (
   tag_id           INT UNSIGNED NOT NULL,

@@ -71,6 +71,11 @@ function facetag_save_config($params)
  * être considérés identiques par la clé primaire (image_id, face_name) et
  * provoquer une erreur "Duplicate entry" fatale à l'insertion, alors qu'ils
  * sont bien distincts pour PHP. utf8mb4_bin compare octet à octet.
+ *
+ * facetag_person_tags est partagée avec face_tag_editor et tag_manager. Sa colonne
+ * `source` vaut toujours 'auto' : 'manual' était prévu pour un écran de correction
+ * jamais réalisé. Elle est gardée pour compatibilité, car face_tag_editor crée la table
+ * lui-même et la nomme dans ses INSERT.
  */
 function facetag_ensure_sync_tables()
 {
@@ -119,7 +124,7 @@ function facetag_resolve_scope_cat_ids($cat_id, $subcats_included)
 /**
  * Compare les tags actuellement attachés à une photo aux noms de visage
  * détectés dans son XMP. Les tags qui correspondent sont confirmés comme
- * "tag visage" (FACETAG_PERSON_TAGS_TABLE, jamais les lignes 'manual').
+ * "tag visage" (FACETAG_PERSON_TAGS_TABLE).
  * N'écrit RIEN sur les visages non résolus : à la charge de l'appelant, qui
  * peut vouloir retenter une correspondance après un sync_metadata() avant
  * de les enregistrer (voir facetag_retry_and_record_unresolved()).
@@ -149,8 +154,8 @@ function facetag_match_faces($image_id, $tag_ids, &$all_tags, $face_names, &$fou
 INSERT INTO '.FACETAG_PERSON_TAGS_TABLE.' (tag_id, is_face_tag, source, example_image_id, updated_at)
 VALUES ('.intval($tag_id).', 1, \'auto\', '.intval($image_id).', \''.$now.'\')
 ON DUPLICATE KEY UPDATE
-  example_image_id = IF(source=\'manual\', example_image_id, VALUES(example_image_id)),
-  updated_at = IF(source=\'manual\', updated_at, VALUES(updated_at))
+  example_image_id = VALUES(example_image_id),
+  updated_at = VALUES(updated_at)
 ;');
       }
     }
@@ -336,8 +341,8 @@ VALUES ('.intval($image_id).', '.intval($tag_id).')
 INSERT INTO '.FACETAG_PERSON_TAGS_TABLE.' (tag_id, is_face_tag, source, example_image_id, updated_at)
 VALUES ('.intval($tag_id).', 1, \'auto\', '.intval($image_id).', \''.$now.'\')
 ON DUPLICATE KEY UPDATE
-  example_image_id = IF(source=\'manual\', example_image_id, VALUES(example_image_id)),
-  updated_at = IF(source=\'manual\', updated_at, VALUES(updated_at))
+  example_image_id = VALUES(example_image_id),
+  updated_at = VALUES(updated_at)
 ;');
         }
       }
@@ -370,7 +375,7 @@ ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at)
  * Compare les tags Piwigo de chaque photo aux noms de visages présents dans
  * son XMP (mwg-rs / MPReg), et enregistre les tag_id correspondants dans la
  * table de correspondance FACETAG_PERSON_TAGS_TABLE.
- * Ne touche jamais les lignes marquées 'manual' (correction manuelle admin).
+ * Ne retire aucune ligne (le retrait est fait par face_tag_editor et tag_manager).
  *
  * Les visages détectés dans le XMP qui ne trouvent aucun tag Piwigo exact
  * correspondant sur leur photo sont enregistrés dans

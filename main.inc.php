@@ -12,6 +12,22 @@ Has Settings: webmaster
 // ============  VERSIONS =========================================================
  // historique des versions
  /*
+ version 2.6 - 24/11/2026 - regroupe 2.5a.1 et 2.5a.2
+      corrigé : cadres de visage mal placés ou manquants sur certaines photos. Les noms et
+      les zones étaient lus séparément dans tout le XMP puis associés dans l'ordre : un nom
+      sans rectangle (Microsoft), un visage sans nom, une région de mise au point ou une
+      zone écrite en attributs décalaient les noms (un nom posé sur le visage d'un autre)
+      ou faisaient disparaître des cadres. Les cadres sont maintenant lus région par
+      région (nom et zone de la même région, visages seulement), comme face_tag_editor 2.6
+      et tag_manager 1.8 ; l'éventuel « Extended XMP » est lu aussi. Un XMP abîmé garde
+      l'ancienne lecture en secours. Effet aussi sur la synchro des tags : un nom sans
+      cadre n'est plus enregistré comme tag visage.
+      nettoyage : la valeur 'manual' de la colonne source de facetag_person_tags
+      n'était écrite par aucun plugin (écran de correction jamais réalisé) ; ses
+      protections sont retirées, la colonne est gardée pour compatibilité avec
+      face_tag_editor (toujours 'auto'). Texte du bouton « Effacer la table des tags
+      visage » corrigé : il annonçait des corrections manuelles perdues qui n'existent pas
+
  version 2.5a - 19/11/2026 - correction 2.5.1
       corrigé : le masquage des tags visage ne s'appliquait pas au widget « Tags »
       de PWG_Stuffs, sauf surcharge manuelle de stuffs_tags.tpl dans le thème ;
@@ -369,8 +385,8 @@ VALUES ('.$image_id.', '.intval($tag_id).')
 INSERT INTO '.FACETAG_PERSON_TAGS_TABLE.' (tag_id, is_face_tag, source, example_image_id, updated_at)
 VALUES ('.intval($tag_id).', 1, \'auto\', '.$image_id.', \''.$now.'\')
 ON DUPLICATE KEY UPDATE
-  example_image_id = IF(source=\'manual\', example_image_id, VALUES(example_image_id)),
-  updated_at = IF(source=\'manual\', updated_at, VALUES(updated_at))
+  example_image_id = VALUES(example_image_id),
+  updated_at = VALUES(updated_at)
 ;');
     }
     catch (\Throwable $e)

@@ -420,7 +420,7 @@
     <legend>{'Réinitialisation des visages'|@translate}</legend>
 
     <p class="formHint">
-      {'Efface entièrement la table de correspondance des tags visage (auto ET manuel). Le nuage de tags public affichera de nouveau tous les tags jusqu\'à la prochaine synchronisation. Les corrections manuelles éventuellement faites sont définitivement perdues.'|@translate}
+      {'Efface entièrement la table de correspondance des tags visage. Le nuage de tags public affichera de nouveau tous les tags jusqu\'à la prochaine synchronisation, qui reconstruit la table à partir des cadres de visage des photos. Cette table sert aussi aux plugins face_tag_editor et tag_manager.'|@translate}
     </p>
     <p class="formHint">
       {'Utile uniquement en cas de problème (ex: repartir de zéro après un changement de configuration) — la synchronisation habituelle (ci-dessus) suffit dans l\'immense majorité des cas.'|@translate}
